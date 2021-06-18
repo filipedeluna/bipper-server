@@ -1,6 +1,7 @@
 package utils.crypto;
 
 import utils.Config;
+import utils.CustomException;
 import utils.CustomRuntimeException;
 
 import javax.crypto.*;
@@ -8,6 +9,7 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
+import java.util.Arrays;
 import java.util.logging.Logger;
 
 public class CryptoHelper {
@@ -37,28 +39,20 @@ public class CryptoHelper {
     }
   }
 
-  public static byte[] decrypt(byte[] buff, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    IvParameterSpec ivSpec = new IvParameterSpec(iv);
+  public static byte[] decrypt(byte[] buff, Key key) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
+    cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(getIVFromByteArray(buff)));
 
-    cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-
-    return cipher.doFinal(buff);
+    return cipher.doFinal(removeIVFromByteArray(buff));
   }
 
   public static byte[] encrypt(byte[] buff, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    IvParameterSpec ivSpec = new IvParameterSpec(iv);
+    cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
 
-    cipher.init(Cipher.ENCRYPT_MODE, key, ivSpec);
-
-    return cipher.doFinal(buff);
+    return joinByteArrays(cipher.doFinal(buff), iv);
   }
 
-  public static String decryptToString(byte[] buff, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    IvParameterSpec ivSpec = new IvParameterSpec(iv);
-
-    cipher.init(Cipher.DECRYPT_MODE, key, ivSpec);
-
-    return new String(decrypt(buff, key, iv), StandardCharsets.UTF_8);
+  public static String decryptToString(byte[] buff, Key key) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
+    return new String(decrypt(buff, key), StandardCharsets.UTF_8);
   }
 
   public static byte[] encryptString(String string, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
@@ -69,7 +63,39 @@ public class CryptoHelper {
     return RandomHelper.getBytes(SEA_IV_SIZE);
   }
 
+
   public static Key generateKey(String keyString) {
     return new SecretKeySpec(messageDigest.digest(keyString.getBytes(StandardCharsets.UTF_8)), SEA_ALG);
+  }
+
+  // UTILS ----------------------------------------------------------------------------------
+  private static byte[] getIVFromByteArray(byte[] array) throws CustomException {
+    if (array.length <= SEA_IV_SIZE)
+      throw new CustomException(logger, "Invalid byte array size");
+
+    return Arrays.copyOfRange(array, array.length - SEA_IV_SIZE, array.length);
+  }
+
+  private static byte[] removeIVFromByteArray(byte[] array) throws CustomException {
+    if (array.length <= SEA_IV_SIZE)
+      throw new CustomException(logger, "Invalid byte array size");
+
+    return Arrays.copyOfRange(array, 0, array.length - SEA_IV_SIZE);
+  }
+
+  private static byte[] joinByteArrays(byte[]... arrays) {
+    byte[] finalArray = new byte[0];
+
+    byte[] tempArray;
+    for (byte[] array : arrays) {
+      tempArray = new byte[finalArray.length + array.length];
+
+      System.arraycopy(finalArray, 0, tempArray, 0, finalArray.length);
+      System.arraycopy(array, 0, tempArray, finalArray.length, array.length);
+
+      finalArray = tempArray;
+    }
+
+    return finalArray;
   }
 }
