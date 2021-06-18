@@ -1,0 +1,26 @@
+version: '3.8'
+
+services:
+  # ISOC PT Services -------------------------------------------------
+  bipper_server:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    network_mode: host
+    depends_on:
+      - bipper_db
+    volumes:
+      - ./log:/log
+
+  bipper_db:
+    image: postgres:alpine
+    ports:
+      - 5433:5432
+    restart: always
+    environment:
+      - POSTGRES_USER=bipper
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=bipper_db
+    volumes:
+      - ../db:/docker-entrypoint-initdb.d
+      - ./postgres-data:/var/lib/postgresql/data
