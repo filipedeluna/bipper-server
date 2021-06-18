@@ -1,15 +1,15 @@
 import com.sun.net.httpserver.HttpServer;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.Config;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.security.Security;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
 public class Server {
-  private static final String PROPS_PATH = "server.properties";
-
   public static void main(String[] args) throws IOException {
     // Check number of arguments
     if (args.length != 1) {
@@ -29,8 +29,11 @@ public class Server {
 
     logger.info("Properties successfully parsed.");
 
-    // Build server
+    // Additional configs
     System.setProperty("java.net.preferIPv4Stack", "true");
+    Security.addProvider(new BouncyCastleProvider());
+
+    // Build server
     InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", Config.serverPort);
     HttpServer server = HttpServer.create(serverAddress, 0);
 
