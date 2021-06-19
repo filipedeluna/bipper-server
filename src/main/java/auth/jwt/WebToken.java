@@ -1,11 +1,16 @@
 package auth.jwt;
 
+import auth.Role;
 import com.google.gson.Gson;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
+import utils.CustomException;
+import utils.crypto.CryptoHelper;
 
-import javax.crypto.spec.SecretKeySpec;
-import javax.management.relation.Role;
-import java.security.Key;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import java.nio.charset.StandardCharsets;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -27,14 +32,6 @@ public class WebToken {
     expiration = Date.from(Instant.now().plus(MAX_TOKEN_DURATION));
   }
 
-  public String toJson() {
-    return gson.toJson(this);
-  }
-
-  public WebToken fromJson(String webToken) {
-    return gson.fromJson(webToken, WebToken.class);
-  }
-
   public String getSubject() {
     return subject;
   }
@@ -43,11 +40,23 @@ public class WebToken {
     return expiration;
   }
 
-  public Role getRole() {
-    return role;
+  public boolean isAdmin() {
+    return role == Role.ADMIN;
   }
 
   public boolean checkExpired() {
     return new Date().before(expiration);
+  }
+
+  public String encrypt() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    String stringifiedToken = gson.toJson(this, WebToken.class);
+
+    return Base64.toBase64String(CryptoHelper.encrypt(stringifiedToken.getBytes()));
+  }
+
+  public static WebToken decrypt(String base64EncryptedToken) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, CustomException, InvalidKeyException {
+    byte[] decryptedTokenBytes = CryptoHelper.decrypt(Base64.decode(base64EncryptedToken));
+
+    return gson.fromJson(new String(decryptedTokenBytes, StandardCharsets.UTF_8), WebToken.class);
   }
 }

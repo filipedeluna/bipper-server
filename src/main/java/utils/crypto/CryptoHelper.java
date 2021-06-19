@@ -1,5 +1,6 @@
 package utils.crypto;
 
+import org.bouncycastle.util.encoders.Base64;
 import utils.Config;
 import utils.CustomException;
 import utils.CustomRuntimeException;
@@ -39,30 +40,18 @@ public class CryptoHelper {
     }
   }
 
-  public static byte[] decrypt(byte[] buff, Key key) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
-    cipher.init(Cipher.DECRYPT_MODE, key, new IvParameterSpec(getIVFromByteArray(buff)));
+  public static byte[] decrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
+    cipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(getIVFromByteArray(buff)));
 
     return cipher.doFinal(removeIVFromByteArray(buff));
   }
 
-  public static byte[] encrypt(byte[] buff, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    cipher.init(Cipher.ENCRYPT_MODE, key, new IvParameterSpec(iv));
+  public static byte[] encrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
+    byte[] iv = RandomHelper.getBytes(SEA_IV_SIZE);
+    cipher.init(Cipher.ENCRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(iv));
 
     return joinByteArrays(cipher.doFinal(buff), iv);
   }
-
-  public static String decryptToString(byte[] buff, Key key) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
-    return new String(decrypt(buff, key), StandardCharsets.UTF_8);
-  }
-
-  public static byte[] encryptString(String string, Key key, byte[] iv) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    return encrypt(string.getBytes(StandardCharsets.UTF_8), key, iv);
-  }
-
-  public static byte[] generateIV() {
-    return RandomHelper.getBytes(SEA_IV_SIZE);
-  }
-
 
   public static Key generateKey(String keyString) {
     return new SecretKeySpec(messageDigest.digest(keyString.getBytes(StandardCharsets.UTF_8)), SEA_ALG);
