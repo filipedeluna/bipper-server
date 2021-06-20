@@ -1,0 +1,27 @@
+-- noinspection SqlResolveForFile
+
+INSERT INTO zones (district, county, zone)
+VALUES ("Lisboa", "Lisboa", "Ajuda"),
+       ("Lisboa", "Lisboa", "Alcântara"),
+       ("Lisboa", "Lisboa", "Alvalade"),
+       ("Lisboa", "Lisboa", "Areeiro"),
+       ("Lisboa", "Lisboa", "Arroios"),
+       ("Lisboa", "Lisboa", "Avenidas Novas"),
+       ("Lisboa", "Lisboa", "Beato"),
+       ("Lisboa", "Lisboa", "Belém"),
+       ("Lisboa", "Lisboa", "Benfica"),
+       ("Lisboa", "Lisboa", "Campo de Ourique"),
+       ("Lisboa", "Lisboa", "Campolide"),
+       ("Lisboa", "Lisboa", "Carnide"),
+       ("Lisboa", "Lisboa", "Estrela"),
+       ("Lisboa", "Lisboa", "Lumiar"),
+       ("Lisboa", "Lisboa", "Marvila"),
+       ("Lisboa", "Lisboa", "Misericórdia"),
+       ("Lisboa", "Lisboa", "Olivais"),
+       ("Lisboa", "Lisboa", "Parque das Nações"),
+       ("Lisboa", "Lisboa", "Penha de França"),
+       ("Lisboa", "Lisboa", "Santa Clara"),
+       ("Lisboa", "Lisboa", "Santa Maria Maior"),
+       ("Lisboa", "Lisboa", "Santo António"),
+       ("Lisboa", "Lisboa", "São Domingues de Benfica"),
+       ("Lisboa", "Lisboa", "São Vicente");
