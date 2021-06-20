@@ -40,7 +40,7 @@ class WebTokenTest {
     WebToken tokenAdmin = new WebToken("admin");
     WebToken tokenUser = new WebToken("user");
 
-    assertEquals("admin", tokenAdmin.getSubject());
-    assertEquals("user", tokenUser.getSubject());
+    assertEquals("admin", tokenAdmin.getUserID());
+    assertEquals("user", tokenUser.getUserID());
   }
 }

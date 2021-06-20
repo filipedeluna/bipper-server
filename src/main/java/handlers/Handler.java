@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import handlers.error.ClientException;
-import utils.Config;
 import utils.CustomException;
 import utils.CustomLogger;
 import utils.net.HTTPStatus;
@@ -61,7 +60,7 @@ public abstract class Handler implements HttpHandler {
     if (webToken.isExpired())
       throw new ClientException("Token is expired.", HTTPStatus.HTTP_UNAUTHORIZED);
 
-    return webToken.getSubject();
+    return webToken.getUserID();
   }
 
   // ----------------------------------------

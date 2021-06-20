@@ -29,7 +29,7 @@ public final class WebToken {
     expiration = Date.from(Instant.now().plus(MAX_TOKEN_DURATION));
   }
 
-  public String getSubject() {
+  public String getUserID() {
     return subject;
   }
 
@@ -43,7 +43,7 @@ public final class WebToken {
     return Base64.toBase64String(CryptoHelper.encrypt(stringifiedToken.getBytes()));
   }
 
-  public static WebToken decrypt(String base64EncryptedToken) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, CustomException, InvalidKeyException {
+  public static WebToken decrypt(String base64EncryptedToken) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
     byte[] decryptedTokenBytes = CryptoHelper.decrypt(Base64.decode(base64EncryptedToken));
 
     return gson.fromJson(new String(decryptedTokenBytes, StandardCharsets.UTF_8), WebToken.class);

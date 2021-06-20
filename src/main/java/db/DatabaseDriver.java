@@ -3,9 +3,12 @@ package db;
 import com.google.gson.Gson;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 import db.error.DatabaseException;
 import handlers.locations.Locations;
+import handlers.post.Post;
+import handlers.post.PostPeriod;
 import utils.CustomLogger;
 
 /**
@@ -124,6 +127,78 @@ public final class DatabaseDriver {
       ps.close();
     } catch (SQLException e) {
       throw new DatabaseException("Failed to insert post.", e);
+    }
+  }
+
+  /**
+   * @return get all unread posts for a user
+   * @throws DatabaseException
+   */
+  public ArrayList<Post> getNewPosts(String userID) throws DatabaseException {
+    try {
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT * FROM posts" +
+              "WHERE post_id NOT IN(SELECT * FROM votes WHERE posts.user_id != ?)" +
+              "ORDER BY post_date DESC" +
+              "LIMIT 10"
+      );
+
+      ps.setString(1, userID);
+
+      ResultSet rs = ps.executeQuery();
+      ArrayList<Post> posts = new ArrayList<>();
+
+      while (rs.next())
+        posts.add(new Post(
+                rs.getInt("post_id"),
+                rs.getInt("post_score"),
+                rs.getDate("post_date"),
+                rs.getString("post_text"),
+                rs.getString("post_image")
+            )
+        );
+
+      ps.close();
+
+      return posts;
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to get locations.", e);
+    }
+  }
+
+  /**
+   * @return get all unread posts for a user
+   * @throws DatabaseException
+   */
+  public ArrayList<Post> getTopPosts(PostPeriod period) throws DatabaseException {
+    try {
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT * FROM posts" +
+              "WHERE post_date > NOW() - INTERVAL '?'" +
+              "ORDER BY post_score DESC" +
+              "LIMIT 10"
+      );
+
+      ps.setString(1, period.getDbPeriod());
+
+      ResultSet rs = ps.executeQuery();
+      ArrayList<Post> posts = new ArrayList<>();
+
+      while (rs.next())
+        posts.add(new Post(
+                rs.getInt("post_id"),
+                rs.getInt("post_score"),
+                rs.getDate("post_date"),
+                rs.getString("post_text"),
+                rs.getString("post_image")
+            )
+        );
+
+      ps.close();
+
+      return posts;
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to get locations.", e);
     }
   }
 }

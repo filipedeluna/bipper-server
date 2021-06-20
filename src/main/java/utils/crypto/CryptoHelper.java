@@ -2,7 +2,6 @@ package utils.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.Config;
-import utils.CustomException;
 import utils.CustomLogger;
 import utils.CustomRuntimeException;
 
@@ -43,7 +42,7 @@ public final class CryptoHelper {
     }
   }
 
-  public static byte[] decrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException, CustomException {
+  public static byte[] decrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
     cipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(getIVFromByteArray(buff)));
 
     return cipher.doFinal(removeIVFromByteArray(buff));
@@ -74,16 +73,16 @@ public final class CryptoHelper {
     return messageDigest.digest(string.getBytes(StandardCharsets.UTF_8));
   }
 
-  private static byte[] getIVFromByteArray(byte[] array) throws CustomException {
+  private static byte[] getIVFromByteArray(byte[] array) throws BadPaddingException {
     if (array.length <= SEA_IV_SIZE)
-      throw new CustomException(logger, "Invalid byte array size");
+      throw new BadPaddingException("Invalid byte array size");
 
     return Arrays.copyOfRange(array, array.length - SEA_IV_SIZE, array.length);
   }
 
-  private static byte[] removeIVFromByteArray(byte[] array) throws CustomException {
+  private static byte[] removeIVFromByteArray(byte[] array) throws BadPaddingException {
     if (array.length <= SEA_IV_SIZE)
-      throw new CustomException(logger, "Invalid byte array size");
+      throw new BadPaddingException("Invalid byte array size");
 
     return Arrays.copyOfRange(array, 0, array.length - SEA_IV_SIZE);
   }
