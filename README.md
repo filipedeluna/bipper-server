@@ -15,7 +15,7 @@ Receives:
 Returns:
 ```json
 {
-    "token": "fFADgtdfhsdhdfhShsadhsHSDhsdhsagdasDgGGdSGShHSDHSHASDH=="
+    "token": string
 }
 ```
 Errors:
@@ -28,19 +28,31 @@ Returns:
 {
   "districts": [
     {
-      "name": "Lisboa",
+      "name": string,
       "counties": [
         {
-          "name": "Torres Vedras",
+          "name": string,
           "zones": [
             {
-              "name": "A dos Cunhados e Maceira",
-              "locationID": 32
+              "name": string,
+              "locationID": int
             }
           ]
         }
       ]
     }
   ]
+}
+ ```
+
+### /posts POST
+Receives:
+```json
+{
+  "token": string,
+  "text": string,
+  "image": string,
+  "locationID": int
+
 }
  ```
