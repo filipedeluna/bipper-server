@@ -2,7 +2,7 @@ package utils;
 
 import java.util.Map;
 
-public class Pair<K, V> implements Map.Entry<K, V> {
+public final class Pair<K, V> implements Map.Entry<K, V> {
   private K key;
   private V value;
 

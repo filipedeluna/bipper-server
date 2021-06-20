@@ -44,7 +44,6 @@ public abstract class Handler implements HttpHandler {
   }
 
   /**
-   *
    * @param token - a base64 encrypted token
    * @return the token userID
    * @throws ClientException if the token is invalid

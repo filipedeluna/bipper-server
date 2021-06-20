@@ -2,7 +2,7 @@ package utils;
 
 import java.util.logging.Logger;
 
-public class CustomRuntimeException extends RuntimeException {
+public final class CustomRuntimeException extends RuntimeException {
   public CustomRuntimeException(Logger logger, String text) {
     super(log(logger, text));
   }

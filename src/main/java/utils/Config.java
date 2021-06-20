@@ -2,16 +2,14 @@ package utils;
 
 import db.DatabaseDriver;
 import db.error.DatabaseException;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.crypto.CryptoHelper;
 
 import java.io.*;
 import java.security.Key;
-import java.security.Security;
 import java.util.Date;
 import java.util.logging.*;
 
-public abstract class Config {
+public final class Config {
   // System
   public static final String PROVIDER = "BC";
   public static String logLevel = "ALL"; // Default

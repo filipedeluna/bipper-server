@@ -14,7 +14,7 @@ import java.security.*;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
-public class CryptoHelper {
+public final class CryptoHelper {
   private static final Logger logger = Config.getLogger(CryptoHelper.class);
 
   private static final String SEA_ALG = "AES";

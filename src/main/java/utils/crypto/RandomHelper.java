@@ -4,7 +4,7 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.util.Base64.Encoder;
 
-public class RandomHelper {
+public final class RandomHelper {
   private static final Encoder stringifier = Base64.getEncoder().withoutPadding();
   private static final SecureRandom random = new SecureRandom();
 

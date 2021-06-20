@@ -9,7 +9,7 @@ import utils.net.SafeInputStreamReader;
 import java.io.IOException;
 import java.util.logging.Logger;
 
-public class LoggingFilter extends Filter {
+public final class LoggingFilter extends Filter {
   private static final Logger logger = Config.getLogger(LoggingFilter.class);
 
   @Override

@@ -1,7 +1,7 @@
 package db.error;
 
 
-public class DatabaseException extends Exception {
+public final class DatabaseException extends Exception {
   public DatabaseException(String text, Exception e) {
     super("Database exception - " + text + " (" + e.getMessage() + ")");
   }

@@ -2,7 +2,7 @@ package utils;
 
 import java.util.logging.Logger;
 
-public class CustomException extends Exception {
+public final class CustomException extends Exception {
   public CustomException(Logger logger, String text) {
     super(log(logger, text));
   }

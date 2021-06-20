@@ -7,12 +7,13 @@ import java.util.*;
 import java.util.logging.Logger;
 
 import db.error.DatabaseException;
+import handlers.locations.Location;
 import utils.Config;
 
 /**
  * Class responsible for communicating with the database
  */
-public class DatabaseDriver {
+public final class DatabaseDriver {
   private static final Logger logger = Config.getLogger(DatabaseDriver.class);
   private static final Gson gson = new Gson();
 
@@ -70,6 +71,30 @@ public class DatabaseDriver {
 
       ps.execute();
       ps.close();
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to check if user exists", e);
+    }
+  }
+
+  public ArrayList<Location> getLocations() throws DatabaseException {
+    try {
+      PreparedStatement ps = connection.prepareStatement("SELECT * FROM locations ORDER BY location_id ASC");
+
+      ResultSet rs = ps.executeQuery();
+      ArrayList<Location> locations = new ArrayList<>();
+
+      while (rs.next())
+        locations.add(new Location(
+                rs.getInt("location_id"),
+                rs.getString("district"),
+                rs.getString("county"),
+                rs.getString("zone")
+            )
+        );
+
+      ps.close();
+
+      return locations;
     } catch (SQLException e) {
       throw new DatabaseException("Failed to check if user exists", e);
     }

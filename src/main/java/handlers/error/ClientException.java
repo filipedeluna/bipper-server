@@ -2,7 +2,7 @@ package handlers.error;
 
 import utils.net.HTTPStatus;
 
-public class ClientException extends Exception {
+public final class ClientException extends Exception {
   private final HTTPStatus status;
 
   public ClientException(String text, HTTPStatus status) {

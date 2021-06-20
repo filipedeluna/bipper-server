@@ -2,23 +2,19 @@ import com.sun.net.httpserver.Filter;
 import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
 import handlers.Handler;
-import handlers.filters.LoggingFilter;
+import handlers.locations.LocationsHandler;
 import handlers.login.LoginHandler;
-import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import handlers.post.PostHandler;
 import utils.Config;
 
 import java.io.IOException;
-import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
-import java.security.Security;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
-import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
-public class Server {
+public final class Server {
   public static void main(String[] args) throws IOException {
     // Check number of arguments
     if (args.length != 1) {
@@ -50,6 +46,8 @@ public class Server {
     // Register routes
     HashMap<String, Handler> routes = new HashMap<>();
     routes.put("/login", new LoginHandler());
+    routes.put("/posts", new PostHandler());
+    routes.put("/locations", new LocationsHandler());
 
     // Add filters
     HashSet<Filter> filters = new HashSet<>();

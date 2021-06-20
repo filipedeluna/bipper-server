@@ -1,6 +1,6 @@
 package handlers.login;
 
-public class LoginRequestBody {
+public final class LoginRequestBody {
   private int userID;
   private int verification;
 

@@ -1,4 +1,4 @@
-package handlers.login;
+package handlers.post;
 
 import auth.WebToken;
 import com.google.gson.JsonObject;
@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import db.error.DatabaseException;
 import handlers.Handler;
+import handlers.login.LoginRequestBody;
 import utils.Config;
 import utils.crypto.CryptoHelper;
 import utils.net.HTTPStatus;
@@ -14,7 +15,7 @@ import utils.net.RequestMethod;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
-public final class LoginHandler extends Handler {
+public final class PostHandler extends Handler {
   @Override
   public void handle(HttpExchange exchange) throws IOException {
     // Validate REST method

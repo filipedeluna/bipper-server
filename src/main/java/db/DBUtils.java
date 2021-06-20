@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-class DBUtils {
+final class DBUtils {
   private static final Logger logger = Config.getLogger(DBUtils.class);
 
   static Connection getConnection(String dbUser, String dbPass, String dbName, String dbAddress) throws SQLException {

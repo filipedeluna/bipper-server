@@ -14,7 +14,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
 
-public class WebToken {
+public final class WebToken {
   private static final transient Duration MAX_TOKEN_DURATION = Duration.ofMinutes(5);
   private static final transient Gson gson = new Gson();
 
