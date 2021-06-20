@@ -12,7 +12,7 @@ CREATE TABLE IF NOT EXISTS locations
 
 CREATE TABLE IF NOT EXISTS users
 (
-    user_id     CHAR(32) PRIMARY KEY,
+    user_id     CHAR(64) PRIMARY KEY,
     user_banned BOOLEAN DEFAULT FALSE NOT NULL,
     user_admin  BOOLEAN DEFAULT FALSE NOT NULL,
     user_points INTEGER DEFAULT 0     NOT NULL
@@ -21,7 +21,7 @@ CREATE TABLE IF NOT EXISTS users
 CREATE TABLE IF NOT EXISTS posts
 (
     post_id          SERIAL PRIMARY KEY,
-    user_id          CHAR(32)                 NOT NULL,
+    user_id          CHAR(64)                 NOT NULL,
     CONSTRAINT fk_user_id
         FOREIGN KEY (user_id)
             REFERENCES users (user_id),
@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS votes
     CONSTRAINT fk_post_id
         FOREIGN KEY (post_id)
             REFERENCES posts (post_id),
-    user_id CHAR(32) NOT NULL,
+    user_id CHAR(64) NOT NULL,
     CONSTRAINT fk_user_id
         FOREIGN KEY (user_id)
             REFERENCES users (user_id),

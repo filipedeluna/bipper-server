@@ -1,6 +1,7 @@
 package auth.jwt;
 
 import auth.Role;
+import auth.WebToken;
 import com.google.gson.Gson;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import org.bouncycastle.util.encoders.Base64;

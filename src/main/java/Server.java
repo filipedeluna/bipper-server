@@ -1,4 +1,9 @@
+import com.sun.net.httpserver.Filter;
+import com.sun.net.httpserver.HttpContext;
 import com.sun.net.httpserver.HttpServer;
+import handlers.Handler;
+import handlers.filters.LoggingFilter;
+import handlers.login.LoginHandler;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.Config;
 
@@ -6,6 +11,10 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
 import java.security.Security;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.concurrent.Executors;
 import java.util.logging.Logger;
 
@@ -31,7 +40,6 @@ public class Server {
 
     // Additional configs
     System.setProperty("java.net.preferIPv4Stack", "true");
-    Security.addProvider(new BouncyCastleProvider());
 
     // Build server
     InetSocketAddress serverAddress = new InetSocketAddress("127.0.0.1", Config.serverPort);
@@ -39,11 +47,19 @@ public class Server {
 
     server.setExecutor(Executors.newFixedThreadPool(Config.serverThreads));
 
-    server.createContext("/register", response -> {
-      response.sendResponseHeaders(HttpURLConnection.HTTP_OK, -1);
-      response.close();
-    });
+    // Register routes
+    HashMap<String, Handler> routes = new HashMap<>();
+    routes.put("/login", new LoginHandler());
 
+    // Add filters
+    HashSet<Filter> filters = new HashSet<>();
+
+    routes.entrySet().stream()
+        .map(route -> server.createContext(route.getKey(), route.getValue()))
+        .map(HttpContext::getFilters)
+        .forEach(filterList -> filterList.addAll(filters));
+
+    // Start server
     logger.info("Server is ready to handle requests at " + serverAddress);
     server.start();
   }

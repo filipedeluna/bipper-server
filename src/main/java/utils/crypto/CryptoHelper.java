@@ -1,6 +1,6 @@
 package utils.crypto;
 
-import org.bouncycastle.util.encoders.Base64;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.Config;
 import utils.CustomException;
 import utils.CustomRuntimeException;
@@ -8,6 +8,7 @@ import utils.CustomRuntimeException;
 import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
@@ -28,6 +29,8 @@ public class CryptoHelper {
   private static final MessageDigest messageDigest;
 
   static {
+    Security.addProvider(new BouncyCastleProvider());
+
     try {
       cipher = Cipher.getInstance(SEA_SPEC, Config.PROVIDER);
       messageDigest = MessageDigest.getInstance("SHA256", Config.PROVIDER);
@@ -54,10 +57,23 @@ public class CryptoHelper {
   }
 
   public static Key generateKey(String keyString) {
-    return new SecretKeySpec(messageDigest.digest(keyString.getBytes(StandardCharsets.UTF_8)), SEA_ALG);
+    return new SecretKeySpec(hashString(keyString), SEA_ALG);
+  }
+
+  public static String hashToHexString(String string) {
+    BigInteger bigInteger = new BigInteger(messageDigest.digest(string.getBytes(StandardCharsets.UTF_8)));
+    return bigInteger.toString(16).toUpperCase();
   }
 
   // UTILS ----------------------------------------------------------------------------------
+  private static byte[] hash(byte[] bytes) {
+    return messageDigest.digest(bytes);
+  }
+
+  private static byte[] hashString(String string) {
+    return messageDigest.digest(string.getBytes(StandardCharsets.UTF_8));
+  }
+
   private static byte[] getIVFromByteArray(byte[] array) throws CustomException {
     if (array.length <= SEA_IV_SIZE)
       throw new CustomException(logger, "Invalid byte array size");

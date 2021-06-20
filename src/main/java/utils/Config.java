@@ -1,9 +1,13 @@
 package utils;
 
+import db.DatabaseDriver;
+import db.error.DatabaseException;
+import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.crypto.CryptoHelper;
 
 import java.io.*;
 import java.security.Key;
+import java.security.Security;
 import java.util.Date;
 import java.util.logging.*;
 
@@ -16,12 +20,12 @@ public abstract class Config {
   public static int serverThreads;
   public static int serverPort;
   public static Key serverSeaKey;
+  public static int maxImageSize;
+  public static int maxPostLength;
+  public static int maxRequestSize;
 
   // Database
-  public static String dbUser;
-  public static String dbPass;
-  public static String dbName;
-  public static String dbAddress;
+  public static DatabaseDriver dbDriver;
 
   /**
    * Parse the properties file and extract the configuration to be used in the program
@@ -50,11 +54,15 @@ public abstract class Config {
 
     serverSeaKey = CryptoHelper.generateKey(props.getProperty("server_sea_key"));
 
+    maxImageSize = Integer.parseInt(props.getProperty("max_image_size_mb", "4")) * 1000 * 1000; // MB
+    maxPostLength = Integer.parseInt(props.getProperty("max_post_length", "350"));
+    maxRequestSize = maxImageSize + maxPostLength + 10000;
+
     // Database ---------------------------------------------------
-    dbUser = props.getProperty("db_user");
-    dbPass = props.getProperty("db_pass");
-    dbName = props.getProperty("db_name");
-    dbAddress = props.getProperty("db_address");
+    String dbUser = props.getProperty("db_user");
+    String dbPass = props.getProperty("db_pass");
+    String dbName = props.getProperty("db_name");
+    String dbAddress = props.getProperty("db_address");
 
     if (dbUser == null)
       throw new CustomRuntimeException(logger, "Undefined database user.");
@@ -67,6 +75,12 @@ public abstract class Config {
 
     if (dbAddress == null)
       throw new CustomRuntimeException(logger, "Undefined database address.");
+
+    try {
+      dbDriver = new DatabaseDriver(dbUser, dbPass, dbName, dbAddress);
+    } catch (DatabaseException e) {
+      e.printStackTrace();
+    }
   }
 
   /**

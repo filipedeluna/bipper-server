@@ -1,6 +1,5 @@
-package auth.jwt;
+package auth;
 
-import auth.Role;
 import com.google.gson.Gson;
 import org.bouncycastle.util.encoders.Base64;
 import utils.CustomException;
