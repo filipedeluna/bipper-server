@@ -8,14 +8,14 @@ EVERY route is expected to respond with 500 if an internal error happens.
 Receives:
 ```json
 {
-	"userID": int,
-	"verification": int
+	"userID": "int",
+	"verification": "int"
 }
 ```
 Returns:
 ```json
 {
-    "token": string
+    "token": "string"
 }
 ```
 Errors:
@@ -28,14 +28,14 @@ Returns:
 {
   "districts": [
     {
-      "name": string,
+      "name": "string",
       "counties": [
         {
-          "name": string,
+          "name": "string",
           "zones": [
             {
-              "name": string,
-              "locationID": int
+              "name": "string",
+              "locationID": "int"
             }
           ]
         }
@@ -49,10 +49,10 @@ Returns:
 Receives:
 ```json
 {
-  "token": string,
-  "text": string,
-  "image": string,
-  "locationID": int
+  "token": "string",
+  "text": "string",
+  "image": "string",
+  "locationID": "int"
 
 }
  ```
