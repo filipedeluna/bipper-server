@@ -25,12 +25,22 @@ Errors:
 ### /locations GET 
 Returns:
 ```json
-[
-  {
-    "locationID": int,
-    "district": string,
-    "county": string,
-    "zone": string
-  }
- ]
+{
+  "districts": [
+    {
+      "name": "Lisboa",
+      "counties": [
+        {
+          "name": "Torres Vedras",
+          "zones": [
+            {
+              "name": "A dos Cunhados e Maceira",
+              "locationID": 32
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
  ```

@@ -3,11 +3,10 @@ package db;
 import com.google.gson.Gson;
 
 import java.sql.*;
-import java.util.*;
 import java.util.logging.Logger;
 
 import db.error.DatabaseException;
-import handlers.locations.Location;
+import handlers.locations.Locations;
 import utils.Config;
 
 /**
@@ -76,20 +75,21 @@ public final class DatabaseDriver {
     }
   }
 
-  public ArrayList<Location> getLocations() throws DatabaseException {
+  public Locations getLocations() throws DatabaseException {
     try {
-      PreparedStatement ps = connection.prepareStatement("SELECT * FROM locations ORDER BY location_id ASC");
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT * FROM locations ORDER BY district, county, zone"
+      );
 
       ResultSet rs = ps.executeQuery();
-      ArrayList<Location> locations = new ArrayList<>();
+      Locations locations = new Locations();
 
       while (rs.next())
-        locations.add(new Location(
-                rs.getInt("location_id"),
-                rs.getString("district"),
-                rs.getString("county"),
-                rs.getString("zone")
-            )
+        locations.addZone(
+            rs.getString("district"),
+            rs.getString("county"),
+            rs.getString("zone"),
+            rs.getInt("location_id")
         );
 
       ps.close();

@@ -9,7 +9,6 @@ import utils.net.HTTPStatus;
 import utils.net.RequestMethod;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 public final class LocationsHandler extends Handler {
   @Override
@@ -22,7 +21,7 @@ public final class LocationsHandler extends Handler {
 
     try {
       // Get locations from DB
-      ArrayList<Location> locations = Config.dbDriver.getLocations();
+      Locations locations = Config.dbDriver.getLocations();
 
       respond(gson.toJson(locations), HTTPStatus.HTTP_OK, exchange);
     } catch (JsonSyntaxException e) {
