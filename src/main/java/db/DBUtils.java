@@ -1,14 +1,14 @@
 package db;
 
 import utils.Config;
+import utils.CustomLogger;
 
 import java.sql.*;
 import java.util.List;
 import java.util.Properties;
-import java.util.logging.Logger;
 
 final class DBUtils {
-  private static final Logger logger = Config.getLogger(DBUtils.class);
+  private static final CustomLogger logger = new CustomLogger(DBUtils.class);
 
   static Connection getConnection(String dbUser, String dbPass, String dbName, String dbAddress) throws SQLException {
     // Build properties and URL

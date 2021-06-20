@@ -3,17 +3,16 @@ package db;
 import com.google.gson.Gson;
 
 import java.sql.*;
-import java.util.logging.Logger;
 
 import db.error.DatabaseException;
 import handlers.locations.Locations;
-import utils.Config;
+import utils.CustomLogger;
 
 /**
  * Class responsible for communicating with the database
  */
 public final class DatabaseDriver {
-  private static final Logger logger = Config.getLogger(DatabaseDriver.class);
+  private static final CustomLogger logger = new CustomLogger(DatabaseDriver.class);
   private static final Gson gson = new Gson();
 
   private static final int MAX_DB_CONNECT_TRIES = 6;

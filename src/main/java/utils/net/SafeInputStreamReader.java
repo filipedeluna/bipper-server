@@ -1,14 +1,14 @@
 package utils.net;
 
 import utils.Config;
+import utils.CustomLogger;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public final class SafeInputStreamReader extends InputStreamReader {
-  Logger logger = Config.getLogger(SafeInputStreamReader.class);
+  CustomLogger logger = new CustomLogger(SafeInputStreamReader.class);
 
   private long bytesRead;
 

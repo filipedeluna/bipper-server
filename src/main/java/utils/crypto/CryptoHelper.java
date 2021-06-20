@@ -3,6 +3,7 @@ package utils.crypto;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
 import utils.Config;
 import utils.CustomException;
+import utils.CustomLogger;
 import utils.CustomRuntimeException;
 
 import javax.crypto.*;
@@ -12,10 +13,9 @@ import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 import java.util.Arrays;
-import java.util.logging.Logger;
 
 public final class CryptoHelper {
-  private static final Logger logger = Config.getLogger(CryptoHelper.class);
+  private static final CustomLogger logger = new CustomLogger(CryptoHelper.class);
 
   private static final String SEA_ALG = "AES";
   private static final String SEA_MODE = "GCM";
@@ -33,7 +33,7 @@ public final class CryptoHelper {
 
     try {
       cipher = Cipher.getInstance(SEA_SPEC, Config.PROVIDER);
-      messageDigest = MessageDigest.getInstance("SHA256", Config.PROVIDER);
+      messageDigest = MessageDigest.getInstance("SHA3-256", Config.PROVIDER);
     } catch (NoSuchAlgorithmException e) {
       throw new CustomRuntimeException(logger, "Algorithm " + SEA_SPEC + " was not found.");
     } catch (NoSuchProviderException e) {

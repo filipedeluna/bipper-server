@@ -6,6 +6,7 @@ import handlers.locations.LocationsHandler;
 import handlers.login.LoginHandler;
 import handlers.post.PostsHandler;
 import utils.Config;
+import utils.CustomLogger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -30,7 +31,7 @@ public final class Server {
 
     // Parse properties and get logger
     Config.parse(args[0]);
-    Logger logger = Config.getLogger(Server.class);
+    CustomLogger logger = new CustomLogger(Server.class);
 
     logger.info("Properties successfully parsed.");
 

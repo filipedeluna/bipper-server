@@ -1,13 +1,11 @@
 package utils;
 
-import java.util.logging.Logger;
-
 public final class CustomRuntimeException extends RuntimeException {
-  public CustomRuntimeException(Logger logger, String text) {
+  public CustomRuntimeException(CustomLogger logger, String text) {
     super(log(logger, text));
   }
 
-  private static String log(Logger logger, String text) {
+  private static String log(CustomLogger logger, String text) {
     logger.finer("[" + logger.getName() + "]: " + text);
 
     return text;

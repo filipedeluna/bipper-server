@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpHandler;
 import handlers.error.ClientException;
 import utils.Config;
 import utils.CustomException;
+import utils.CustomLogger;
 import utils.net.HTTPStatus;
 import utils.net.SafeInputStreamReader;
 
@@ -15,10 +16,9 @@ import java.io.OutputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
-import java.util.logging.Logger;
 
 public abstract class Handler implements HttpHandler {
-  protected static final Logger logger = Config.getLogger(Handler.class);
+  protected static final CustomLogger logger = new CustomLogger(Handler.class);
   protected static final Gson gson = new Gson();
 
   protected void respond(String body, HTTPStatus status, HttpExchange exchange) throws IOException {
@@ -69,7 +69,7 @@ public abstract class Handler implements HttpHandler {
   // ----------------------------------------
 
   private void logResponse(String body, HttpExchange httpExchange, HTTPStatus status) {
-    logger.info(String.join("\n",
+    logger.fine(String.join("\n",
         "\n[RESPONSE] ",
         "\tStatus: " + status.getCode(),
         "\tMethod: " + httpExchange.getRequestMethod(),
@@ -85,7 +85,7 @@ public abstract class Handler implements HttpHandler {
     try {
       String body = new SafeInputStreamReader(exchange.getRequestBody()).toString();
 
-      logger.info(" " + String.join("\n",
+      logger.fine(" " + String.join("\n",
           "\n[REQUEST]: ",
           "\tMethod: " + exchange.getRequestMethod(),
           "\tURI: " + exchange.getRequestURI().getPath(),

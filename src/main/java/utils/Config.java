@@ -41,7 +41,7 @@ public final class Config {
     }
 
     logLevel = props.getProperty("log_level", "ALL");
-    Logger logger = getLogger(Config.class);
+    CustomLogger logger = new CustomLogger(Config.class);
 
     // Server ---------------------------------------------------
     serverThreads = Integer.parseInt(props.getProperty("server_threads", "4"));
@@ -78,51 +78,6 @@ public final class Config {
       dbDriver = new DatabaseDriver(dbUser, dbPass, dbName, dbAddress);
     } catch (DatabaseException e) {
       e.printStackTrace();
-    }
-  }
-
-  /**
-   * Creates an instance of the programs custom logger for different classes
-   *
-   * @param clazz the class for the logger
-   * @return new logger instance for a given class
-   */
-  public static Logger getLogger(Class<?> clazz) {
-    // Get level from properties and configure the handler with its properties
-    Logger logger = Logger.getLogger(clazz.getName());
-    logger.setUseParentHandlers(false);
-    logger.setLevel(Level.parse(logLevel));
-
-    // Configure console handler
-    StreamHandler consoleHandler = new ConsoleHandler();
-    consoleHandler.setLevel(Level.parse(logLevel));
-    consoleHandler.setFormatter(new CustomLoggerDateFormatter());
-    logger.addHandler(consoleHandler);
-
-    // Configure file handler
-    try {
-      FileHandler fileHandler = new FileHandler("log.txt", true);
-      fileHandler.setLevel(Level.parse(logLevel));
-      fileHandler.setFormatter(new CustomLoggerDateFormatter());
-      logger.addHandler(fileHandler);
-    } catch (IOException | SecurityException e) {
-      throw new RuntimeException("Failed to write to log file location in client.properties file.");
-    }
-
-    return logger;
-  }
-
-  public static class CustomLoggerDateFormatter extends SimpleFormatter {
-    private static final String format = "[%1$tF %1$tT][%2$s][%3$s]: %4$s %n";
-
-    @Override
-    public synchronized String format(LogRecord lr) {
-      return String.format(format,
-          new Date(lr.getMillis()),
-          lr.getLoggerName(),
-          lr.getLevel().getLocalizedName(),
-          lr.getMessage()
-      );
     }
   }
 }
