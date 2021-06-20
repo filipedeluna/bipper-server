@@ -29,20 +29,21 @@ public abstract class Handler implements HttpHandler {
   }
 
   protected void respond(HttpExchange exchange, HTTPStatus status) throws IOException {
-    logResponse("EMPTY", exchange, status);
+    logResponse("", exchange, status);
 
     exchange.sendResponseHeaders(status.getCode(), 0);
     exchange.close();
   }
 
   private void logResponse(String body, HttpExchange httpExchange, HTTPStatus status) {
-    logger.info(String.join("\t",
-        "[RESPONSE] Status: " + status.getCode(),
-        "Method: " + httpExchange.getResponseCode(),
-        "URI: " + httpExchange.getRequestURI().getPath(),
-        "To: " + httpExchange.getRemoteAddress().toString(),
-        "Response Code: " + httpExchange.getResponseCode(),
-        "Body: " + (body.length() < 100 ? body : "Too big!")
+    logger.info(String.join("\n",
+        "\n[RESPONSE] ",
+        "\tStatus: " + status.getCode(),
+        "\tMethod: " + httpExchange.getRequestMethod(),
+        "\tURI: " + httpExchange.getRequestURI().getPath(),
+        "\tTo: " + httpExchange.getRemoteAddress().toString(),
+        "\tResponse Code: " + status.getCode(),
+        "\tBody: " + (body.length() < 100 ? body : "Too big!")
         )
     );
   }
@@ -50,12 +51,12 @@ public abstract class Handler implements HttpHandler {
   protected String getBodyAndLog(HttpExchange exchange) {
     String body = new SafeInputStreamReader(exchange.getRequestBody()).toString();
 
-    logger.info(" " + String.join("\t",
-        "[REQUEST]: ",
-        "Method: " + exchange.getRequestMethod(),
-        "URI: " + exchange.getRequestURI().getPath(),
-        "From: " + exchange.getRemoteAddress().toString(),
-        "Body: " + (body.length() < 100 ? body : "Too big!")
+    logger.info(" " + String.join("\n",
+        "\n[REQUEST]: ",
+        "\tMethod: " + exchange.getRequestMethod(),
+        "\tURI: " + exchange.getRequestURI().getPath(),
+        "\tFrom: " + exchange.getRemoteAddress().toString(),
+        "\tBody: " + (body.length() < 100 ? body : "Too big!")
         )
     );
 

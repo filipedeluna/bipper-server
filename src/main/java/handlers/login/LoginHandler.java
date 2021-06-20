@@ -36,7 +36,7 @@ public class LoginHandler extends Handler {
 
         Config.dbDriver.createUserIfNotExists(userHash);
 
-        respond(exchange, HTTPStatus.HTTP_ACCEPTED);
+        respond(exchange, HTTPStatus.HTTP_OK);
       } else {
         respond("Invalid verification code.", exchange, HTTPStatus.HTTP_UNAUTHORIZED);
       }
