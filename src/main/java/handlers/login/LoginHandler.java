@@ -28,6 +28,11 @@ public final class LoginHandler extends Handler {
       String body = getBodyAndLog(exchange);
       LoginRequestBody requestBody = gson.fromJson(body, LoginRequestBody.class);
 
+      if (requestBody == null) {
+        respond("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
+        return;
+      }
+
       int userID = requestBody.getUserID();
       int verification = requestBody.getVerification();
 
