@@ -57,6 +57,7 @@ $$
 BEGIN
     INSERT INTO votes(post_id, user_id)
     VALUES (new.post_id, new.user_id);
+    RETURN new;
 END;
 $$;
 

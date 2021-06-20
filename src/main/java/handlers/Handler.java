@@ -12,6 +12,7 @@ import utils.net.SafeInputStreamReader;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
@@ -80,18 +81,23 @@ public abstract class Handler implements HttpHandler {
     );
   }
 
-  protected String getBodyAndLog(HttpExchange exchange) {
-    String body = new SafeInputStreamReader(exchange.getRequestBody()).toString();
+  protected String getBodyAndLog(HttpExchange exchange) throws ClientException {
+    try {
+      String body = new SafeInputStreamReader(exchange.getRequestBody()).toString();
 
-    logger.info(" " + String.join("\n",
-        "\n[REQUEST]: ",
-        "\tMethod: " + exchange.getRequestMethod(),
-        "\tURI: " + exchange.getRequestURI().getPath(),
-        "\tFrom: " + exchange.getRemoteAddress().toString(),
-        "\tBody: " + (body.length() < 100 ? body : "Too big!")
-        )
-    );
+      logger.info(" " + String.join("\n",
+          "\n[REQUEST]: ",
+          "\tMethod: " + exchange.getRequestMethod(),
+          "\tURI: " + exchange.getRequestURI().getPath(),
+          "\tFrom: " + exchange.getRemoteAddress().toString(),
+          "\tBody: " + (body.length() < 100 ? body : "Too big!")
+          )
+      );
 
-    return body;
+      return body;
+    } catch (UncheckedIOException e) {
+      throw new ClientException("Request body is too large.",HTTPStatus.HTTP_BAD_REQUEST);
+    }
+
   }
 }

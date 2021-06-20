@@ -6,6 +6,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import db.error.DatabaseException;
 import handlers.Handler;
+import handlers.error.ClientException;
 import utils.Config;
 import utils.crypto.CryptoHelper;
 import utils.net.HTTPStatus;
@@ -23,13 +24,12 @@ public final class LoginHandler extends Handler {
       return;
     }
 
-    String body = getBodyAndLog(exchange);
-
     try {
-      LoginRequestBody loginRequestBody = gson.fromJson(body, LoginRequestBody.class);
+      String body = getBodyAndLog(exchange);
+      LoginRequestBody requestBody = gson.fromJson(body, LoginRequestBody.class);
 
-      int userID = loginRequestBody.getUserID();
-      int verification = loginRequestBody.getVerification();
+      int userID = requestBody.getUserID();
+      int verification = requestBody.getVerification();
 
       // Validate number and verification
       if (userID < 900000000 || userID > 999999999) {
@@ -63,6 +63,8 @@ public final class LoginHandler extends Handler {
     } catch (DatabaseException | GeneralSecurityException e) {
       logger.severe(e.getClass().toString() + ": " + e.getMessage());
       respond(HTTPStatus.HTTP_SERVER_ERROR, exchange);
+    } catch (ClientException e) {
+      respond(e, exchange);
     }
   }
 }

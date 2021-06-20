@@ -4,7 +4,7 @@ import com.sun.net.httpserver.HttpServer;
 import handlers.Handler;
 import handlers.locations.LocationsHandler;
 import handlers.login.LoginHandler;
-import handlers.post.PostHandler;
+import handlers.post.PostsHandler;
 import utils.Config;
 
 import java.io.IOException;
@@ -46,7 +46,7 @@ public final class Server {
     // Register routes
     HashMap<String, Handler> routes = new HashMap<>();
     routes.put("/login", new LoginHandler());
-    routes.put("/posts", new PostHandler());
+    routes.put("/posts", new PostsHandler());
     routes.put("/locations", new LocationsHandler());
 
     // Add filters

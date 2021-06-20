@@ -1,12 +1,12 @@
 package handlers.post;
 
-public final class PostRequestBody {
+public final class PostsPostRequestBody {
   private String token;
   private String text;
   private String image;
-  private String location_id;
+  private int locationID;
 
-  public PostRequestBody() {
+  public PostsPostRequestBody() {
   }
 
   public String getToken() {
@@ -21,7 +21,7 @@ public final class PostRequestBody {
     return image;
   }
 
-  public String getLocation_id() {
-    return location_id;
+  public int getLocationID() {
+    return locationID;
   }
 }

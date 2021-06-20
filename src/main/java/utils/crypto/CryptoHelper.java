@@ -61,7 +61,7 @@ public final class CryptoHelper {
   }
 
   public static String hashToHexString(String string) {
-    BigInteger bigInteger = new BigInteger(messageDigest.digest(string.getBytes(StandardCharsets.UTF_8)));
+    BigInteger bigInteger = new BigInteger(joinByteArrays(new byte[]{0}, messageDigest.digest(string.getBytes(StandardCharsets.UTF_8))));
     return bigInteger.toString(16).toUpperCase();
   }
 

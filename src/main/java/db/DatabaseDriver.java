@@ -71,10 +71,14 @@ public final class DatabaseDriver {
       ps.execute();
       ps.close();
     } catch (SQLException e) {
-      throw new DatabaseException("Failed to check if user exists", e);
+      throw new DatabaseException("Failed to check if user exists.", e);
     }
   }
 
+  /**
+   * @return all the locations and zones ordered alphabetically
+   * @throws DatabaseException
+   */
   public Locations getLocations() throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
@@ -96,7 +100,31 @@ public final class DatabaseDriver {
 
       return locations;
     } catch (SQLException e) {
-      throw new DatabaseException("Failed to check if user exists", e);
+      throw new DatabaseException("Failed to get locations.", e);
+    }
+  }
+
+  /**
+   * Check if a user exists in the database, if not, create it
+   *
+   * @throws DatabaseException if check or create user
+   */
+  public void insertPost(String userID, int locationID, String text, String image) throws DatabaseException {
+    try {
+      PreparedStatement ps = connection.prepareStatement(
+          "INSERT INTO posts (user_id, post_location_id, post_text, post_image)" +
+              " VALUES (?, ?, ?, ?)"
+      );
+
+      ps.setString(1, userID);
+      ps.setInt(2, locationID);
+      ps.setString(3, text);
+      ps.setString(4, image);
+
+      ps.execute();
+      ps.close();
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to insert post.", e);
     }
   }
 }
