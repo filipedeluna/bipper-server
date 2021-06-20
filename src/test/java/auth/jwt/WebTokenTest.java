@@ -1,6 +1,5 @@
 package auth.jwt;
 
-import auth.Role;
 import auth.WebToken;
 import com.google.gson.Gson;
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
@@ -27,7 +26,7 @@ class WebTokenTest {
     Security.addProvider(new BouncyCastleProvider());
     Config.serverSeaKey = CryptoHelper.generateKey("password2000");
 
-    WebToken tokenAdmin = new WebToken("admin", Role.ADMIN);
+    WebToken tokenAdmin = new WebToken("admin");
 
     byte[] encryptedTokenAdminBytes = CryptoHelper.encrypt(gson.toJson(tokenAdmin).getBytes(StandardCharsets.UTF_8));
     String base64EncryptedTokenAdmin = Base64.toBase64String(encryptedTokenAdminBytes);
@@ -38,11 +37,8 @@ class WebTokenTest {
 
   @Test
   void tokenTest() {
-    WebToken tokenAdmin = new WebToken("admin", Role.ADMIN);
-    WebToken tokenUser = new WebToken("user", Role.USER);
-
-    assertTrue(tokenAdmin.isAdmin());
-    assertFalse(tokenUser.isAdmin());
+    WebToken tokenAdmin = new WebToken("admin");
+    WebToken tokenUser = new WebToken("user");
 
     assertEquals("admin", tokenAdmin.getSubject());
     assertEquals("user", tokenUser.getSubject());

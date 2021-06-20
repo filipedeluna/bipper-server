@@ -19,15 +19,13 @@ public class WebToken {
   private static final transient Gson gson = new Gson();
 
   private String subject;
-  private Role role;
   private Date expiration;
 
   public WebToken() {
   }
 
-  public WebToken(String subject, Role role) {
+  public WebToken(String subject) {
     this.subject = subject;
-    this.role = role;
     expiration = Date.from(Instant.now().plus(MAX_TOKEN_DURATION));
   }
 
@@ -35,16 +33,8 @@ public class WebToken {
     return subject;
   }
 
-  public Date getExpiration() {
-    return expiration;
-  }
-
-  public boolean isAdmin() {
-    return role == Role.ADMIN;
-  }
-
-  public boolean checkExpired() {
-    return new Date().before(expiration);
+  public boolean isExpired() {
+    return new Date().after(expiration);
   }
 
   public String encrypt() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {

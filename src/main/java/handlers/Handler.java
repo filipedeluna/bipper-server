@@ -1,22 +1,26 @@
 package handlers;
 
+import auth.WebToken;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import handlers.error.ClientException;
 import utils.Config;
+import utils.CustomException;
 import utils.net.HTTPStatus;
 import utils.net.SafeInputStreamReader;
 
 import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
+import java.security.GeneralSecurityException;
 import java.util.logging.Logger;
 
 public abstract class Handler implements HttpHandler {
   protected static final Logger logger = Config.getLogger(Handler.class);
   protected static final Gson gson = new Gson();
 
-  protected void respond(String body, HttpExchange exchange, HTTPStatus status) throws IOException {
+  protected void respond(String body, HTTPStatus status, HttpExchange exchange) throws IOException {
     OutputStream outputStream = exchange.getResponseBody();
     exchange.sendResponseHeaders(status.getCode(), body.getBytes(StandardCharsets.UTF_8).length);
     outputStream.write(body.getBytes(StandardCharsets.UTF_8));
@@ -28,12 +32,41 @@ public abstract class Handler implements HttpHandler {
     exchange.close();
   }
 
-  protected void respond(HttpExchange exchange, HTTPStatus status) throws IOException {
+  protected void respond(ClientException exception, HttpExchange exchange) throws IOException {
+    respond(exception.getMessage(), exception.getStatus(), exchange);
+  }
+
+  protected void respond(HTTPStatus status, HttpExchange exchange) throws IOException {
     logResponse("", exchange, status);
 
     exchange.sendResponseHeaders(status.getCode(), 0);
     exchange.close();
   }
+
+  /**
+   *
+   * @param token - a base64 encrypted token
+   * @return the token userID
+   * @throws ClientException if the token is invalid
+   */
+  protected String validateToken(String token) throws ClientException {
+    WebToken webToken;
+
+    try {
+      webToken = WebToken.decrypt(token);
+    } catch (GeneralSecurityException | CustomException e) {
+      throw new ClientException("Token is corrupted.", HTTPStatus.HTTP_BAD_REQUEST);
+    }
+
+    if (webToken.isExpired())
+      throw new ClientException("Token is expired.", HTTPStatus.HTTP_UNAUTHORIZED);
+
+    return webToken.getSubject();
+  }
+
+  // ----------------------------------------
+  // UTILS ----------------------------------
+  // ----------------------------------------
 
   private void logResponse(String body, HttpExchange httpExchange, HTTPStatus status) {
     logger.info(String.join("\n",
