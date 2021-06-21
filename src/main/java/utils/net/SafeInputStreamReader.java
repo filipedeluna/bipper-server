@@ -8,8 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.stream.Collectors;
 
 public final class SafeInputStreamReader extends InputStreamReader {
-  CustomLogger logger = new CustomLogger(SafeInputStreamReader.class);
-
+  private static final CustomLogger logger = new CustomLogger(SafeInputStreamReader.class);
   private long bytesRead;
 
   // This class makes it so users can't send HUGE files and DOS

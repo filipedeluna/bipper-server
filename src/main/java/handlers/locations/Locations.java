@@ -84,5 +84,9 @@ public class Locations {
       this.name = name;
       this.locationID = locationID;
     }
+
+    public int getLocationID() {
+      return locationID;
+    }
   }
 }

@@ -1,6 +1,5 @@
 package db;
 
-import utils.Config;
 import utils.CustomLogger;
 
 import java.sql.*;

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class CryptoHelperTest {
   @Test
-  void encryptString() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, CustomException {
+  void encryptString() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
     Security.addProvider(new BouncyCastleProvider());
     Config.serverSeaKey = CryptoHelper.generateKey("password2000");
 

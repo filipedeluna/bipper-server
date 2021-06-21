@@ -1,22 +1,21 @@
 package db;
 
-import com.google.gson.Gson;
-
 import java.sql.*;
 import java.util.ArrayList;
 
 import db.error.DatabaseException;
+import handlers.error.ClientException;
 import handlers.locations.Locations;
 import handlers.post.Post;
 import handlers.post.PostPeriod;
 import utils.CustomLogger;
+import utils.net.HTTPStatus;
 
 /**
  * Class responsible for communicating with the database
  */
 public final class DatabaseDriver {
   private static final CustomLogger logger = new CustomLogger(DatabaseDriver.class);
-  private static final Gson gson = new Gson();
 
   private static final int MAX_DB_CONNECT_TRIES = 6;
 
@@ -79,7 +78,7 @@ public final class DatabaseDriver {
 
   /**
    * @return all the locations and zones ordered alphabetically
-   * @throws DatabaseException
+   * @throws DatabaseException if fails
    */
   public Locations getLocations() throws DatabaseException {
     try {
@@ -132,15 +131,15 @@ public final class DatabaseDriver {
 
   /**
    * @return get all unread posts for a user
-   * @throws DatabaseException
+   * @throws DatabaseException if fails
    */
   public ArrayList<Post> getNewPosts(String userID) throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
-              "WHERE post_id NOT IN(SELECT * FROM votes WHERE posts.user_id != ?)" +
-              "ORDER BY post_date DESC" +
-              "LIMIT 10"
+              " WHERE post_id NOT IN (SELECT post_id FROM votes WHERE user_id = ?)" +
+              " ORDER BY post_date DESC" +
+              " LIMIT 10"
       );
 
       ps.setString(1, userID);
@@ -162,21 +161,21 @@ public final class DatabaseDriver {
 
       return posts;
     } catch (SQLException e) {
-      throw new DatabaseException("Failed to get locations.", e);
+      throw new DatabaseException("Failed to get new posts.", e);
     }
   }
 
   /**
    * @return get all unread posts for a user
-   * @throws DatabaseException
+   * @throws DatabaseException if fails
    */
   public ArrayList<Post> getTopPosts(PostPeriod period) throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
-              "WHERE post_date > NOW() - INTERVAL '?'" +
-              "ORDER BY post_score DESC" +
-              "LIMIT 10"
+              " WHERE post_date > NOW() - ?::INTERVAL" +
+              " ORDER BY post_score DESC" +
+              " LIMIT 10"
       );
 
       ps.setString(1, period.getDbPeriod());
@@ -201,4 +200,77 @@ public final class DatabaseDriver {
       throw new DatabaseException("Failed to get locations.", e);
     }
   }
+
+  /**
+   * Make a user vote for a post
+   *
+   * @throws DatabaseException if fails
+   */
+  public void votePost(String userID, int postID) throws DatabaseException, ClientException {
+    try {
+      // Check post exists
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT * FROM posts WHERE post_id = ?"
+      );
+
+      ps.setInt(1, postID);
+
+      ResultSet rs = ps.executeQuery();
+
+      if (!rs.next())
+        throw new ClientException("Post does not exist.", HTTPStatus.HTTP_NOT_FOUND);
+
+      // Check user is not author
+      ps = connection.prepareStatement(
+          "SELECT * FROM posts WHERE post_id = ? AND user_id != ?"
+      );
+
+      ps.setInt(1, postID);
+      ps.setString(2, userID);
+
+      rs = ps.executeQuery();
+
+      if (!rs.next())
+        throw new ClientException("User is original author.", HTTPStatus.HTTP_FORBIDDEN);
+
+      // Register vote
+      ps = connection.prepareStatement(
+          "INSERT INTO votes (user_id, post_id) VALUES (?, ?) ON CONFLICT DO NOTHING"
+      );
+
+      ps.setString(1, userID);
+      ps.setInt(2, postID);
+
+      int updated = ps.executeUpdate();
+
+      if (updated == 1) {
+        // Get score
+        ps = connection.prepareStatement(
+            "SELECT post_score FROM posts WHERE post_id = ?"
+        );
+
+        ps.setInt(1, postID);
+
+        rs = ps.executeQuery();
+        rs.next();
+
+        int score = rs.getInt("post_score") + 1;
+
+        ps = connection.prepareStatement(
+            "UPDATE posts SET post_score = ? WHERE post_id = ?"
+        );
+
+        ps.setInt(1, score);
+        ps.setInt(2, postID);
+
+        ps.executeUpdate();
+      }
+
+      ps.execute();
+      ps.close();
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to insert post.", e);
+    }
+  }
 }
+

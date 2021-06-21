@@ -1,6 +1,5 @@
 package utils;
 
-import handlers.error.ClientException;
 import org.bouncycastle.util.encoders.Base64;
 
 import javax.imageio.IIOImage;

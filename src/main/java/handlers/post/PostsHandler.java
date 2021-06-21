@@ -13,6 +13,7 @@ import utils.net.RequestMethod;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.IllegalFormatException;
 
 public final class PostsHandler extends Handler {
   @Override
@@ -50,7 +51,8 @@ public final class PostsHandler extends Handler {
 
           // Handle top posts
           if (path.startsWith("/posts/top/")) {
-            PostPeriod postPeriod = PostPeriod.parse(path.split("\\\\")[3]);
+            String periodString = path.replace("/posts/top/", "");
+            PostPeriod postPeriod = PostPeriod.parse(periodString);
 
             if (postPeriod.equals(PostPeriod.NULL)) {
               respond("Invalid time period.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
@@ -82,8 +84,12 @@ public final class PostsHandler extends Handler {
           String text = requestBody.getText();
           String image = requestBody.getImage();
 
-          if (image.length() > 0)
-            image = ImageCompressor.compress(image);
+          try {
+            if (image.length() > 0)
+              image = ImageCompressor.compress(image);
+          } catch (IOException | IllegalArgumentException | UnsupportedOperationException | IllegalStateException e) {
+            throw new ClientException("Invalid image. Please use a jpg.", HTTPStatus.HTTP_BAD_REQUEST);
+          }
 
           Config.dbDriver.insertPost(userID, locationID, text, image);
 

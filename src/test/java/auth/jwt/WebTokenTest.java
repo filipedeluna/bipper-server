@@ -19,10 +19,10 @@ import java.security.Security;
 import static org.junit.jupiter.api.Assertions.*;
 
 class WebTokenTest {
-  Gson gson = new Gson();
+  private final Gson gson = new Gson();
 
   @Test
-  void cryptoTest() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException, CustomException {
+  void cryptoTest() throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
     Security.addProvider(new BouncyCastleProvider());
     Config.serverSeaKey = CryptoHelper.generateKey("password2000");
 

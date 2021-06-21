@@ -48,23 +48,3 @@ CREATE TABLE IF NOT EXISTS votes
 
     PRIMARY KEY (post_id, user_id)
 );
-
-CREATE OR REPLACE FUNCTION add_user_vote_on_new_post()
-    RETURNS TRIGGER
-    LANGUAGE plpgsql
-AS
-$$
-BEGIN
-    INSERT INTO votes(post_id, user_id)
-    VALUES (new.post_id, new.user_id);
-    RETURN new;
-END;
-$$;
-
-CREATE TRIGGER user_new_post
-    AFTER INSERT
-    ON posts
-    FOR EACH ROW
-EXECUTE PROCEDURE add_user_vote_on_new_post();
-
-

@@ -56,3 +56,59 @@ Receives:
 
 }
  ```
+ Errors:
+ - 400: Invalid request body.
+
+### /posts/new GET
+Receives:
+```json
+{
+  "token": "string",
+}
+```
+Returns:
+```json
+[
+  {
+    "postID": "int",
+    "score": "int",
+    "date": "jun 21, 2021",
+    "text": "string",
+    "image": "string"
+  }
+]
+```
+
+Errors:
+- 400: Invalid request body.
+
+### /posts/top/(all-time | year | month | week) GET
+Returns:
+```json
+[
+  {
+    "postID": "int",
+    "score": "int",
+    "date": "jun 21, 2021",
+    "text": "string",
+    "image": "string"
+  }
+]
+```
+Errors:
+- 400: Invalid time period
+ 
+### /vote POST
+Receives:
+```json
+{
+  "token": "string",
+  "postID": "int"
+}
+```
+
+Errors: 
+- 400: Invalid request body.
+- 404: Post does not exist.
+- 403: User is original author.
+

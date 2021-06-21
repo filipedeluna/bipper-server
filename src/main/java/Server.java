@@ -5,6 +5,7 @@ import handlers.Handler;
 import handlers.locations.LocationsHandler;
 import handlers.login.LoginHandler;
 import handlers.post.PostsHandler;
+import handlers.vote.VoteHandler;
 import utils.Config;
 import utils.CustomLogger;
 
@@ -13,7 +14,6 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.concurrent.Executors;
-import java.util.logging.Logger;
 
 public final class Server {
   public static void main(String[] args) throws IOException {
@@ -49,6 +49,7 @@ public final class Server {
     routes.put("/login", new LoginHandler());
     routes.put("/posts", new PostsHandler());
     routes.put("/locations", new LocationsHandler());
+    routes.put("/vote", new VoteHandler());
 
     // Add filters
     HashSet<Filter> filters = new HashSet<>();

@@ -1,5 +1,7 @@
 package handlers.post;
 
+import java.util.Locale;
+
 public enum PostPeriod {
   ALL_TIME("100 years"),
   YEAR("1 year"),
@@ -18,9 +20,11 @@ public enum PostPeriod {
   }
 
   public static PostPeriod parse(String string) {
-    switch (string.toUpperCase()) {
+    switch (string.toLowerCase()) {
       case "all-time":
         return ALL_TIME;
+      case "year":
+        return YEAR;
       case "month":
         return MONTH;
       case "week":

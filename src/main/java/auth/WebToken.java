@@ -2,7 +2,6 @@ package auth;
 
 import com.google.gson.Gson;
 import org.bouncycastle.util.encoders.Base64;
-import utils.CustomException;
 import utils.crypto.CryptoHelper;
 
 import javax.crypto.BadPaddingException;

@@ -5,7 +5,6 @@ import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import handlers.error.ClientException;
-import utils.CustomException;
 import utils.CustomLogger;
 import utils.net.HTTPStatus;
 import utils.net.SafeInputStreamReader;
@@ -53,7 +52,7 @@ public abstract class Handler implements HttpHandler {
 
     try {
       webToken = WebToken.decrypt(token);
-    } catch (GeneralSecurityException | CustomException e) {
+    } catch (GeneralSecurityException e) {
       throw new ClientException("Token is corrupted.", HTTPStatus.HTTP_BAD_REQUEST);
     }
 

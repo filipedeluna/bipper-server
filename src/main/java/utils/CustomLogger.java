@@ -37,23 +37,23 @@ public class CustomLogger {
   }
 
   public void info(String message) {
-    log.info(message);
+    log.info("[" + name + "]" + message);
   }
 
   public void severe(String message) {
-    log.severe(message);
+    log.severe("[" + name + "]" + message);
   }
 
   public void fine(String message) {
-    log.fine(message);
+    log.fine("[" + name + "]" + message);
   }
 
   public void finer(String message) {
-    log.finer(message);
+    log.finer("[" + name + "]" + message);
   }
 
   public void finest(String message) {
-    log.finest(message);
+    log.finest("[" + name + "]" + message);
   }
 
   public String getName() {

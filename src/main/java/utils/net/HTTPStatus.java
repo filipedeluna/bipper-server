@@ -1,5 +1,6 @@
 package utils.net;
 
+@SuppressWarnings("unused")
 public enum HTTPStatus {
   HTTP_OK(200),
   HTTP_CREATED(201),
@@ -37,7 +38,7 @@ public enum HTTPStatus {
   HTTP_GATEWAY_TIMEOUT(504),
   HTTP_VERSION(505);
 
-  private int code;
+  private final int code;
 
   HTTPStatus(int code) {
     this.code = code;

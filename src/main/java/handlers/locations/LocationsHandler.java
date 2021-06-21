@@ -28,7 +28,7 @@ public final class LocationsHandler extends Handler {
       logger.info("Invalid login request body.");
       respond("Invalid login request body.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
     } catch (DatabaseException e) {
-      logger.severe(e.getClass().toString() + ": " + e.getMessage());
+      logger.severe(e.getClass() + ": " + e.getMessage());
       respond(HTTPStatus.HTTP_SERVER_ERROR, exchange);
     }
   }
