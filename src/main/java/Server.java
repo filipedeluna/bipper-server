@@ -5,6 +5,7 @@ import handlers.Handler;
 import handlers.locations.LocationsHandler;
 import handlers.login.LoginHandler;
 import handlers.post.PostsHandler;
+import handlers.score.ScoreHandler;
 import handlers.vote.VoteHandler;
 import utils.Config;
 import utils.CustomLogger;
@@ -50,6 +51,7 @@ public final class Server {
     routes.put("/posts", new PostsHandler());
     routes.put("/locations", new LocationsHandler());
     routes.put("/vote", new VoteHandler());
+    routes.put("/score", new ScoreHandler());
 
     // Add filters
     HashSet<Filter> filters = new HashSet<>();

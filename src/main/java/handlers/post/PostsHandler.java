@@ -13,7 +13,6 @@ import utils.net.RequestMethod;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.IllegalFormatException;
 
 public final class PostsHandler extends Handler {
   @Override
@@ -31,10 +30,8 @@ public final class PostsHandler extends Handler {
           if (path.equals("/posts/new")) {
             PostsGetRequestBody requestBody = gson.fromJson(body, PostsGetRequestBody.class);
 
-            if (requestBody == null) {
-              respond("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-              return;
-            }
+            if (requestBody == null)
+              throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
             try {
               WebToken token = WebToken.decrypt(requestBody.getToken());
@@ -47,37 +44,35 @@ public final class PostsHandler extends Handler {
               respond(HTTPStatus.HTTP_SERVER_ERROR, exchange);
               return;
             }
-          }
-
-          // Handle top posts
-          if (path.startsWith("/posts/top/")) {
+          } else if (path.startsWith("/posts/top/")) {
+            // Handle top posts
             String periodString = path.replaceFirst("/posts/top/", "");
             PostPeriod postPeriod = PostPeriod.parse(periodString);
 
-            if (postPeriod.equals(PostPeriod.NULL)) {
-              respond("Invalid time period.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-              return;
-            }
+            if (postPeriod.equals(PostPeriod.NULL))
+              throw new ClientException("Invalid time period.", HTTPStatus.HTTP_BAD_REQUEST);
 
             ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod);
 
             respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
             return;
-          }
+          } else
+            throw new ClientException("Not found.", HTTPStatus.HTTP_NOT_FOUND);
         }
 
         // -------------------------------------
         // HANDLE POST -------------------------
         // -------------------------------------
         case POST: {
+          if (!exchange.getRequestURI().getPath().equals("/posts"))
+            throw new ClientException("Not found", HTTPStatus.HTTP_NOT_FOUND);
+
           String body = getBodyAndLog(exchange);
 
           PostsPostRequestBody requestBody = gson.fromJson(body, PostsPostRequestBody.class);
 
-          if (requestBody == null) {
-            respond("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-            return;
-          }
+          if (requestBody == null)
+            throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
           String userID = validateToken(requestBody.getToken());
           int locationID = requestBody.getLocationID();

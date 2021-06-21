@@ -5,6 +5,8 @@
 EVERY route is expected to respond with 500 if an internal error happens.
 
 ### /login GET 
+Login/register and get a token
+
 Receives:
 ```json
 {
@@ -23,6 +25,8 @@ Errors:
 - 401: Invalid verification code.
 
 ### /locations GET 
+Get list of available loacations
+
 Returns:
 ```json
 {
@@ -46,6 +50,8 @@ Returns:
  ```
 
 ### /posts POST
+Create a post
+
 Receives:
 ```json
 {
@@ -60,6 +66,8 @@ Receives:
  - 400: Invalid request body.
 
 ### /posts/new GET
+Get new, unread posts
+
 Receives:
 ```json
 {
@@ -83,6 +91,8 @@ Errors:
 - 400: Invalid request body.
 
 ### /posts/top/(all-time | year | month | week) GET
+Get top posts
+
 Returns:
 ```json
 [
@@ -97,8 +107,11 @@ Returns:
 ```
 Errors:
 - 400: Invalid time period
+- 405: Invalid method type.
  
-### /vote POST
+### /vote/(up | down) POST
+Vote for a post
+
 Receives:
 ```json
 {
@@ -108,7 +121,35 @@ Receives:
 ```
 
 Errors: 
-- 400: Invalid request body.
+- 400: Invalid request body or vote type.
+- 401: User is original author.
 - 404: Post does not exist.
+- 405: Invalid method type.
+
+Notes: 
+- duplicate votes are ignored
+
+### /score POST
+Get a users score
+
+Receives:
+```json
+{
+  "token": "string",
+}
+```
+
+Responds:
+```json
+{
+  "userScore": "int",
+}
+```
+
+Errors: 
+- 400: Invalid request body or token.
+- 401: User token not authorized or expired.
 - 403: User is original author.
+- 404: Post or user does not exist.
+- 405: Invalid method type.
 

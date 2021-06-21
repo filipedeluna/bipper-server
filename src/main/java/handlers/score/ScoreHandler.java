@@ -1,24 +1,25 @@
-package handlers.vote;
+package handlers.score;
 
+import auth.WebToken;
+import com.google.gson.JsonObject;
 import com.sun.net.httpserver.HttpExchange;
 import db.error.DatabaseException;
 import handlers.Handler;
 import handlers.error.ClientException;
-import handlers.post.PostPeriod;
-import handlers.post.PostsPostRequestBody;
+import handlers.vote.VoteRequestBody;
+import handlers.vote.VoteType;
 import utils.Config;
-import utils.ImageCompressor;
 import utils.net.HTTPStatus;
 import utils.net.RequestMethod;
 
 import java.io.IOException;
 
-public final class VoteHandler extends Handler {
+public final class ScoreHandler extends Handler {
   @Override
   public void handle(HttpExchange exchange) throws IOException {
     try {
       // Validate REST method
-      if (!RequestMethod.POST.equals(exchange))
+      if (!RequestMethod.GET.equals(exchange))
         throw new ClientException("Invalid method.", HTTPStatus.HTTP_BAD_METHOD);
 
       // Extract body
@@ -31,18 +32,19 @@ public final class VoteHandler extends Handler {
       String userID = validateToken(requestBody.getToken());
       int postID = requestBody.getPostID();
 
-      // Validate path to extract vote type
+      // Validate path
       String path = exchange.getRequestURI().getPath();
 
-      String voteTypeString = path.replaceFirst("/vote/", "");
-      VoteType voteType = VoteType.parse(voteTypeString);
+      if (!path.equals("/score"))
+        throw new ClientException("Not found", HTTPStatus.HTTP_NOT_FOUND);
 
-      if (voteType == VoteType.NULL)
-        throw new ClientException("Invalid vote type.", HTTPStatus.HTTP_BAD_REQUEST);
+      int score = Config.dbDriver.getUserScore(userID);
 
-      Config.dbDriver.votePost(userID, postID, voteType);
+      // Create token
+      JsonObject jsonObject = new JsonObject();
+      jsonObject.addProperty("userScore", score);
 
-      respond(HTTPStatus.HTTP_OK, exchange);
+      respond(jsonObject.toString(), HTTPStatus.HTTP_OK, exchange);
     } catch (ClientException e) {
       respond(e, exchange);
     } catch (DatabaseException e) {

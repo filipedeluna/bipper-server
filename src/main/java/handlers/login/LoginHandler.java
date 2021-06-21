@@ -18,39 +18,34 @@ import java.security.GeneralSecurityException;
 public final class LoginHandler extends Handler {
   @Override
   public void handle(HttpExchange exchange) throws IOException {
-    // Validate REST method
-    if (!RequestMethod.GET.equals(exchange)) {
-      respond(HTTPStatus.HTTP_BAD_METHOD, exchange);
-      return;
-    }
-
     try {
+      // Validate Route
+      if (!exchange.getRequestURI().getPath().equals("/login"))
+        throw new ClientException("Invalid method.", HTTPStatus.HTTP_NOT_FOUND);
+
+      // Validate REST method
+      if (!RequestMethod.GET.equals(exchange))
+        throw new ClientException("Invalid method.", HTTPStatus.HTTP_BAD_METHOD);
+
+      // Get body
       String body = getBodyAndLog(exchange);
       LoginRequestBody requestBody = gson.fromJson(body, LoginRequestBody.class);
 
-      if (requestBody == null) {
-        respond("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-        return;
-      }
+      if (requestBody == null)
+        throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
       int userID = requestBody.getUserID();
       int verification = requestBody.getVerification();
 
       // Validate number and verification
-      if (userID < 900000000 || userID > 999999999) {
-        respond("Invalid Phone number format.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-        return;
-      }
+      if (userID < 900000000 || userID > 999999999)
+        throw new ClientException("Invalid Phone number format.", HTTPStatus.HTTP_BAD_REQUEST);
 
-      if (verification < 100000 || verification > 999999) {
-        respond("Invalid verification code format.", HTTPStatus.HTTP_BAD_REQUEST, exchange);
-        return;
-      }
+      if (verification < 100000 || verification > 999999)
+        throw new ClientException("Invalid verification code format.", HTTPStatus.HTTP_BAD_REQUEST);
 
-      if (!Integer.toString(userID).substring(3, 9).equals(Integer.toString(verification))) {
-        respond("Invalid verification code.", HTTPStatus.HTTP_UNAUTHORIZED, exchange);
-        return;
-      }
+      if (!Integer.toString(userID).substring(3, 9).equals(Integer.toString(verification)))
+        throw new ClientException("Invalid verification code.", HTTPStatus.HTTP_UNAUTHORIZED);
 
       // Create the user if it does not exist yet
       String userHash = CryptoHelper.hashToHexString(Integer.toString(userID));

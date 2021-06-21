@@ -281,5 +281,33 @@ public final class DatabaseDriver {
       throw new DatabaseException("Failed to insert post.", e);
     }
   }
+
+  /**
+   * @return get score for a user
+   * @throws DatabaseException if fails
+   */
+  public int getUserScore(String userID) throws DatabaseException, ClientException {
+    try {
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT user_score FROM users WHERE user_id = ?"
+      );
+
+      ps.setString(1, userID);
+
+      ResultSet rs = ps.executeQuery();
+
+      int score;
+
+      if (rs.next())
+        score = rs.getInt("user_score");
+      else
+        throw new ClientException("User does not exist.", HTTPStatus.HTTP_NOT_FOUND);
+
+      return score;
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to get locations.", e);
+    }
+  }
+
 }
 
