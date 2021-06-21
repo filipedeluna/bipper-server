@@ -209,9 +209,9 @@ public final class DatabaseDriver {
    */
   public void votePost(String userID, int postID, VoteType voteType) throws DatabaseException, ClientException {
     try {
-      // Check post exists
+      // Check post exists and get original poster id
       PreparedStatement ps = connection.prepareStatement(
-          "SELECT * FROM posts WHERE post_id = ?"
+          "SELECT user_id FROM posts WHERE post_id = ?"
       );
 
       ps.setInt(1, postID);
@@ -220,6 +220,11 @@ public final class DatabaseDriver {
 
       if (!rs.next())
         throw new ClientException("Post does not exist.", HTTPStatus.HTTP_NOT_FOUND);
+
+      String originalPoster = rs.getString("user_id");
+
+      if (userID.equals(originalPoster))
+        throw new ClientException("Original author cant vote for post.", HTTPStatus.HTTP_UNAUTHORIZED);
 
       // Add vote if vote does not exist
       ArrayList<PreparedStatement> transaction = new ArrayList<>();
@@ -231,9 +236,7 @@ public final class DatabaseDriver {
               " SET post_score = post_score + ?" +
               " WHERE post_id = ?" +
               " AND ? NOT IN" +
-              "   (SELECT user_id FROM votes WHERE post_id = ?)" +
-              " AND ? NOT IN" +
-              "   (SELECT user_id FROM posts WHERE post_id = ?)"
+              "   (SELECT user_id FROM votes WHERE post_id = ?)"
       );
 
       ps.setInt(1, voteValue);
@@ -243,24 +246,28 @@ public final class DatabaseDriver {
       ps.setString(3, userID);
       ps.setInt(4, postID);
 
-      ps.setString(5, userID);
-      ps.setInt(6, postID);
-
       transaction.add(ps);
 
       ps = connection.prepareStatement(
           "UPDATE users" +
               " SET user_score = user_score + ?" +
+              " WHERE user_id = ?" +
               " AND ? NOT IN" +
               "   (SELECT user_id FROM votes WHERE post_id = ?)"
       );
 
       ps.setInt(1, voteValue);
 
-      ps.setInt(2, postID);
-      ps.setString(3, userID);
+      ps.setString(2, originalPoster);
 
-      ps = connection.prepareStatement("INSERT INTO votes (user_id, post_id) values (?, ?) ON CONFLICT DO NOTHING");
+      ps.setString(3, userID);
+      ps.setInt(4, postID);
+
+      transaction.add(ps);
+
+      ps = connection.prepareStatement(
+          "INSERT INTO votes (user_id, post_id) values (?, ?) ON CONFLICT DO NOTHING"
+      );
 
       ps.setString(1, userID);
       ps.setInt(2, postID);
