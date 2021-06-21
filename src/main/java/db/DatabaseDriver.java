@@ -8,6 +8,7 @@ import handlers.error.ClientException;
 import handlers.locations.Locations;
 import handlers.post.Post;
 import handlers.post.PostPeriod;
+import handlers.vote.VoteType;
 import utils.CustomLogger;
 import utils.net.HTTPStatus;
 
@@ -206,7 +207,7 @@ public final class DatabaseDriver {
    *
    * @throws DatabaseException if fails
    */
-  public void votePost(String userID, int postID) throws DatabaseException, ClientException {
+  public void votePost(String userID, int postID, VoteType voteType) throws DatabaseException, ClientException {
     try {
       // Check post exists
       PreparedStatement ps = connection.prepareStatement(
@@ -220,53 +221,54 @@ public final class DatabaseDriver {
       if (!rs.next())
         throw new ClientException("Post does not exist.", HTTPStatus.HTTP_NOT_FOUND);
 
-      // Check user is not author
+      // Add vote if vote does not exist
+      ArrayList<PreparedStatement> transaction = new ArrayList<>();
+
+      int voteValue = voteType == VoteType.UP ? 1 : -1;
+
       ps = connection.prepareStatement(
-          "SELECT * FROM posts WHERE post_id = ? AND user_id != ?"
+          "UPDATE posts" +
+              " SET post_score = post_score + ?" +
+              " WHERE post_id = ?" +
+              " AND ? NOT IN" +
+              "   (SELECT user_id FROM votes WHERE post_id = ?)" +
+              " AND ? NOT IN" +
+              "   (SELECT user_id FROM posts WHERE post_id = ?)"
       );
 
-      ps.setInt(1, postID);
-      ps.setString(2, userID);
+      ps.setInt(1, voteValue);
 
-      rs = ps.executeQuery();
+      ps.setInt(2, postID);
 
-      if (!rs.next())
-        throw new ClientException("User is original author.", HTTPStatus.HTTP_FORBIDDEN);
+      ps.setString(3, userID);
+      ps.setInt(4, postID);
 
-      // Register vote
+      ps.setString(5, userID);
+      ps.setInt(6, postID);
+
+      transaction.add(ps);
+
       ps = connection.prepareStatement(
-          "INSERT INTO votes (user_id, post_id) VALUES (?, ?) ON CONFLICT DO NOTHING"
+          "UPDATE users" +
+              " SET user_score = user_score + ?" +
+              " AND ? NOT IN" +
+              "   (SELECT user_id FROM votes WHERE post_id = ?)"
       );
+
+      ps.setInt(1, voteValue);
+
+      ps.setInt(2, postID);
+      ps.setString(3, userID);
+
+      ps = connection.prepareStatement("INSERT INTO votes (user_id, post_id) values (?, ?) ON CONFLICT DO NOTHING");
 
       ps.setString(1, userID);
       ps.setInt(2, postID);
 
-      int updated = ps.executeUpdate();
+      transaction.add(ps);
 
-      if (updated == 1) {
-        // Get score
-        ps = connection.prepareStatement(
-            "SELECT post_score FROM posts WHERE post_id = ?"
-        );
+      DBUtils.executeTransaction(transaction);
 
-        ps.setInt(1, postID);
-
-        rs = ps.executeQuery();
-        rs.next();
-
-        int score = rs.getInt("post_score") + 1;
-
-        ps = connection.prepareStatement(
-            "UPDATE posts SET post_score = ? WHERE post_id = ?"
-        );
-
-        ps.setInt(1, score);
-        ps.setInt(2, postID);
-
-        ps.executeUpdate();
-      }
-
-      ps.execute();
       ps.close();
     } catch (SQLException e) {
       throw new DatabaseException("Failed to insert post.", e);

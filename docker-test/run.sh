@@ -8,7 +8,8 @@ git pull origin master
 echo "Restarting Docker image..."
 cd docker-test || exit
 sudo rm -rf postgres-data
-sudo docker-compose down || exit
+
+sudo docker-compose down --remove-orphans --volumes || exit
 sudo docker system prune -f --volumes || exit
 sudo docker-compose up --remove-orphans --build -d || exit
 

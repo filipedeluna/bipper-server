@@ -51,7 +51,7 @@ public final class PostsHandler extends Handler {
 
           // Handle top posts
           if (path.startsWith("/posts/top/")) {
-            String periodString = path.replace("/posts/top/", "");
+            String periodString = path.replaceFirst("/posts/top/", "");
             PostPeriod postPeriod = PostPeriod.parse(periodString);
 
             if (postPeriod.equals(PostPeriod.NULL)) {

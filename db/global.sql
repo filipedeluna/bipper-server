@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS users
     user_id     CHAR(64) PRIMARY KEY,
     user_banned BOOLEAN DEFAULT FALSE NOT NULL,
     user_admin  BOOLEAN DEFAULT FALSE NOT NULL,
-    user_points INTEGER DEFAULT 0     NOT NULL
+    user_score  INTEGER DEFAULT 0     NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS posts
