@@ -1,6 +1,7 @@
 package utils.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
+import org.bouncycastle.util.encoders.Base64;
 import utils.Config;
 import utils.CustomLogger;
 import utils.CustomRuntimeException;
@@ -16,14 +17,13 @@ import java.util.Arrays;
 public final class CryptoHelper {
   private static final CustomLogger logger = new CustomLogger(CryptoHelper.class);
 
-  private static final String SEA_ALG = "AES";
-  private static final String SEA_MODE = "GCM";
-  private static final String SEA_PAD = "NoPadding";
-  private static final int SEA_KEY_SIZE = 32;
   private static final int SEA_IV_SIZE = 12;
 
-  private static final String SEA_SPEC = SEA_ALG + "/" + SEA_MODE + "/" + SEA_PAD;
-  private static final Cipher cipher;
+  private static final String SEA_ALG = "AES";
+  private static final String ECB_SPEC = "AES/ECB/PKCS5Padding";
+  private static final String GCM_SPEC = "AES/GCM/NoPadding";
+  private static final Cipher gcmCipher;
+  private static final Cipher ecbCipher;
 
   private static final MessageDigest messageDigest;
 
@@ -31,36 +31,43 @@ public final class CryptoHelper {
     Security.addProvider(new BouncyCastleProvider());
 
     try {
-      cipher = Cipher.getInstance(SEA_SPEC, Config.PROVIDER);
+      gcmCipher = Cipher.getInstance(GCM_SPEC, Config.PROVIDER);
+      ecbCipher = Cipher.getInstance(ECB_SPEC, Config.PROVIDER);
       messageDigest = MessageDigest.getInstance("SHA3-256", Config.PROVIDER);
     } catch (NoSuchAlgorithmException e) {
-      throw new CustomRuntimeException(logger, "Algorithm " + SEA_SPEC + " was not found.");
+      throw new CustomRuntimeException(logger, "Algorithm was not found.");
     } catch (NoSuchProviderException e) {
       throw new CustomRuntimeException(logger, "Provider " + Config.PROVIDER + " was not found.");
     } catch (NoSuchPaddingException e) {
-      throw new CustomRuntimeException(logger, "Padding " + SEA_PAD + " was not found.");
+      throw new CustomRuntimeException(logger, "Padding was not found.");
     }
   }
 
   public static byte[] decrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    cipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(getIVFromByteArray(buff)));
+    gcmCipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(getIVFromByteArray(buff)));
 
-    return cipher.doFinal(removeIVFromByteArray(buff));
+    return gcmCipher.doFinal(removeIVFromByteArray(buff));
   }
 
   public static byte[] encrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
     byte[] iv = RandomHelper.getBytes(SEA_IV_SIZE);
-    cipher.init(Cipher.ENCRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(iv));
+    gcmCipher.init(Cipher.ENCRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(iv));
 
-    return joinByteArrays(cipher.doFinal(buff), iv);
+    return joinByteArrays(gcmCipher.doFinal(buff), iv);
+  }
+
+  public static byte[] ecbHash(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
+    ecbCipher.init(Cipher.ENCRYPT_MODE, Config.serverSeaKey);
+
+    return hash(ecbCipher.doFinal(buff));
   }
 
   public static Key generateKey(String keyString) {
     return new SecretKeySpec(hashString(keyString), SEA_ALG);
   }
 
-  public static String hashToHexString(String string) {
-    BigInteger bigInteger = new BigInteger(joinByteArrays(new byte[]{0}, messageDigest.digest(string.getBytes(StandardCharsets.UTF_8))));
+  public static String encryptUserName(String user) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+    BigInteger bigInteger = new BigInteger(joinByteArrays(new byte[]{0}, CryptoHelper.ecbHash(user.getBytes(StandardCharsets.UTF_8))));
     return bigInteger.toString(16).toUpperCase();
   }
 

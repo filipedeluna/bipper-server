@@ -48,7 +48,7 @@ public final class LoginHandler extends Handler {
         throw new ClientException("Invalid verification code.", HTTPStatus.HTTP_UNAUTHORIZED);
 
       // Create the user if it does not exist yet
-      String userHash = CryptoHelper.hashToHexString(Integer.toString(userID));
+      String userHash = CryptoHelper.encryptUserName(Integer.toString(userID));
       Config.dbDriver.createUserIfNotExists(userHash);
 
       // Create token
