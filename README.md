@@ -94,7 +94,12 @@ Errors:
 
 ### /posts/top/(all-time | year | month | week) GET
 Get top posts
-
+Optional:
+```json
+{
+  "index": "int" -> optional last post read
+}
+```
 Returns:
 ```json
 [
