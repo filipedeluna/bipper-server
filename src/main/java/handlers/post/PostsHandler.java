@@ -26,16 +26,21 @@ public final class PostsHandler extends Handler {
           String body = getBodyAndLog(exchange);
           String path = exchange.getRequestURI().getPath();
 
+          PostsGetRequestBody requestBody = gson.fromJson(body, PostsGetRequestBody.class);
+
           // Handle new posts
           if (path.equals("/posts/new")) {
-            PostsGetRequestBody requestBody = gson.fromJson(body, PostsGetRequestBody.class);
-
             if (requestBody == null)
               throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
             try {
               WebToken token = WebToken.decrypt(requestBody.getToken());
-              ArrayList<Post> posts = Config.dbDriver.getNewPosts(token.getUserID());
+              int index = requestBody.getIndex();
+
+              if (index < 0)
+                throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
+
+              ArrayList<Post> posts = Config.dbDriver.getNewPosts(token.getUserID(), index);
 
               respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
               return;
@@ -52,7 +57,12 @@ public final class PostsHandler extends Handler {
             if (postPeriod.equals(PostPeriod.NULL))
               throw new ClientException("Invalid time period.", HTTPStatus.HTTP_BAD_REQUEST);
 
-            ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod);
+            int index = requestBody.getIndex();
+
+            if (index < 0)
+              throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
+
+            ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod, index);
 
             respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
             return;

@@ -64,7 +64,7 @@ Receives:
  ```
  Errors:
  - 400: Invalid request body.
- - 403: Posting too fast
+ - 403: Posting too fast.
 
 ### /posts/new GET
 Get new, unread posts
@@ -73,6 +73,7 @@ Receives:
 ```json
 {
   "token": "string",
+  "index": "int" -> optional last post read
 }
 ```
 Returns:

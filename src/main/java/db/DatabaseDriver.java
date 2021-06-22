@@ -148,16 +148,18 @@ public final class DatabaseDriver {
    * @return get all unread posts for a user
    * @throws DatabaseException if fails
    */
-  public ArrayList<Post> getNewPosts(String userID) throws DatabaseException {
+  public ArrayList<Post> getNewPosts(String userID, int index) throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
               " WHERE post_id NOT IN (SELECT post_id FROM votes WHERE user_id = ?)" +
-              " ORDER BY post_date DESC" +
+              " AND post_id < ?" +
+              " ORDER BY post_id DESC" +
               " LIMIT 10"
       );
 
       ps.setString(1, userID);
+      ps.setInt(2, index != 0 ? index : Integer.MAX_VALUE);
 
       ResultSet rs = ps.executeQuery();
       ArrayList<Post> posts = new ArrayList<>();
@@ -184,16 +186,19 @@ public final class DatabaseDriver {
    * @return get all unread posts for a user
    * @throws DatabaseException if fails
    */
-  public ArrayList<Post> getTopPosts(PostPeriod period) throws DatabaseException {
+  public ArrayList<Post> getTopPosts(PostPeriod period, int index) throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
               " WHERE post_date > NOW() - ?::INTERVAL" +
-              " ORDER BY post_score DESC" +
+              " AND post_id < ?" +
+              " ORDER BY post_id DESC" +
               " LIMIT 10"
       );
 
       ps.setString(1, period.getDbPeriod());
+
+      ps.setInt(2, index != 0 ? index : Integer.MAX_VALUE);
 
       ResultSet rs = ps.executeQuery();
       ArrayList<Post> posts = new ArrayList<>();
