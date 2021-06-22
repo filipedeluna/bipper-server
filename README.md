@@ -64,6 +64,7 @@ Receives:
  ```
  Errors:
  - 400: Invalid request body.
+ - 403: Posting too fast
 
 ### /posts/new GET
 Get new, unread posts

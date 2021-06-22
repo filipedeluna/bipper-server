@@ -111,9 +111,23 @@ public final class DatabaseDriver {
    *
    * @throws DatabaseException if check or create user
    */
-  public void insertPost(String userID, int locationID, String text, String image) throws DatabaseException {
+  public void insertPost(String userID, int locationID, String text, String image) throws DatabaseException, ClientException {
     try {
+      // Check when was user last post
       PreparedStatement ps = connection.prepareStatement(
+          "SELECT * FROM posts WHERE user_id = ? " +
+              "AND post_date > now() - interval '5 minutes'"
+      );
+
+      ps.setString(1, userID);
+
+      ResultSet rs = ps.executeQuery();
+
+      if (rs.next())
+        throw new ClientException("Posting too fast.", HTTPStatus.HTTP_FORBIDDEN);
+
+      // Insert post
+      ps = connection.prepareStatement(
           "INSERT INTO posts (user_id, post_location_id, post_text, post_image)" +
               " VALUES (?, ?, ?, ?)"
       );
