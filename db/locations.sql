@@ -1,4 +1,4 @@
-INSERT INTO locations (district, county, zone)
+INSERT INTO locations (location_district, location_county, location_zone)
 VALUES ('Lisboa', 'Lisboa', 'Alvalade'),
        ('Lisboa', 'Lisboa', 'Parque das Nações'),
        ('Lisboa', 'Lisboa', 'Penha de França'),

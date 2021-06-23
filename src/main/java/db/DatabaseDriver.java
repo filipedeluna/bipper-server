@@ -62,20 +62,111 @@ public final class DatabaseDriver {
    *
    * @throws DatabaseException if check or create user
    */
-  public void createUserIfNotExists(String userID) throws DatabaseException {
+  public void createUserIfNotExists(String userID, int locationID) throws DatabaseException, ClientException {
     try {
+      // Check user exists
       PreparedStatement ps = connection.prepareStatement(
-          "INSERT INTO users (user_id) VALUES (?) ON CONFLICT DO NOTHING"
+          "SELECT user_id FROM users WHERE user_id = ?"
       );
 
       ps.setString(1, userID);
 
-      ps.execute();
+      ResultSet rs = ps.executeQuery();
+
+      // User does not exists
+      if (!rs.next()) {
+        if (locationID == -1)
+          throw new ClientException("User id not found registered.", HTTPStatus.HTTP_NOT_FOUND);
+
+        // Check location exists
+        ps = connection.prepareStatement(
+            "SELECT location_id FROM locations WHERE location_id = ?"
+        );
+
+        ps.setInt(1, locationID);
+
+        rs = ps.executeQuery();
+
+        if (!rs.next())
+          throw new ClientException("Invalid location id.", HTTPStatus.HTTP_BAD_REQUEST);
+
+        ps = connection.prepareStatement(
+            "INSERT INTO users (user_id, user_location_id) VALUES (?, ?) ON CONFLICT DO NOTHING"
+        );
+
+        ps.setString(1, userID);
+        ps.setInt(2, locationID);
+
+        ps.execute();
+      }
+
       ps.close();
     } catch (SQLException e) {
       throw new DatabaseException("Failed to check if user exists.", e);
     }
   }
+
+  /**
+   * Set a new location for users posts
+   *
+   * @throws DatabaseException if check or create user
+   */
+  public void setUserLocation(String userID, int locationID) throws DatabaseException, ClientException {
+    try {
+      // Check location exists
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT location_id FROM locations WHERE location_id = ?"
+      );
+
+      ps.setInt(1, locationID);
+
+      ResultSet rs = ps.executeQuery();
+
+      if (!rs.next())
+        throw new ClientException("Invalid location id.", HTTPStatus.HTTP_BAD_REQUEST);
+
+      ps = connection.prepareStatement(
+          "UPDATE users SET user_location_id = ? WHERE user_id = ?"
+      );
+
+      ps.setInt(1, locationID);
+      ps.setString(2, userID);
+
+      ps.execute();
+      ps.close();
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to set user location.", e);
+    }
+  }
+
+  /**
+   * Get the users current registered location
+   *
+   * @throws DatabaseException if check or create user
+   */
+  public int getUserLocation(String userID) throws DatabaseException, ClientException {
+    try {
+      PreparedStatement ps = connection.prepareStatement(
+          "SELECT user_location_id FROM users WHERE user_id = ?"
+      );
+
+      ps.setString(1, userID);
+
+      ResultSet rs = ps.executeQuery();
+
+      if (!rs.next())
+        throw new ClientException("Invalid location id.", HTTPStatus.HTTP_NOT_FOUND);
+
+      int locationID = rs.getInt("user_location_id");
+
+      ps.close();
+
+      return locationID;
+    } catch (SQLException e) {
+      throw new DatabaseException("Failed to check if user exists.", e);
+    }
+  }
+
 
   /**
    * @return all the locations and zones ordered alphabetically
@@ -84,7 +175,7 @@ public final class DatabaseDriver {
   public Locations getLocations() throws DatabaseException {
     try {
       PreparedStatement ps = connection.prepareStatement(
-          "SELECT * FROM locations ORDER BY district, county, zone"
+          "SELECT * FROM locations ORDER BY location_district, location_county, location_zone"
       );
 
       ResultSet rs = ps.executeQuery();
@@ -92,9 +183,9 @@ public final class DatabaseDriver {
 
       while (rs.next())
         locations.addZone(
-            rs.getString("district"),
-            rs.getString("county"),
-            rs.getString("zone"),
+            rs.getString("location_district"),
+            rs.getString("location_county"),
+            rs.getString("location_zone"),
             rs.getInt("location_id")
         );
 
@@ -115,7 +206,7 @@ public final class DatabaseDriver {
     try {
       // Check when was user last post
       PreparedStatement ps = connection.prepareStatement(
-          "SELECT * FROM posts WHERE user_id = ? " +
+          "SELECT * FROM posts WHERE post_user_id = ? " +
               "AND post_date > now() - interval '5 minutes'"
       );
 
@@ -128,7 +219,7 @@ public final class DatabaseDriver {
 
       // Insert post
       ps = connection.prepareStatement(
-          "INSERT INTO posts (user_id, post_location_id, post_text, post_image)" +
+          "INSERT INTO posts (post_user_id, post_location_id, post_text, post_image)" +
               " VALUES (?, ?, ?, ?)"
       );
 
@@ -152,7 +243,7 @@ public final class DatabaseDriver {
     try {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
-              " WHERE post_id NOT IN (SELECT post_id FROM votes WHERE user_id = ?)" +
+              " WHERE post_id NOT IN (SELECT vote_post_id FROM votes WHERE vote_user_id = ?)" +
               " AND post_id < ?" +
               " ORDER BY post_id DESC" +
               " LIMIT 10"
@@ -230,7 +321,7 @@ public final class DatabaseDriver {
     try {
       // Check post exists and get original poster id
       PreparedStatement ps = connection.prepareStatement(
-          "SELECT user_id FROM posts WHERE post_id = ?"
+          "SELECT user_id FROM posts WHERE post_user_id = ?"
       );
 
       ps.setInt(1, postID);
@@ -240,7 +331,7 @@ public final class DatabaseDriver {
       if (!rs.next())
         throw new ClientException("Post does not exist.", HTTPStatus.HTTP_NOT_FOUND);
 
-      String originalPoster = rs.getString("user_id");
+      String originalPoster = rs.getString("post_user_id");
 
       if (userID.equals(originalPoster))
         throw new ClientException("Original author cant vote for post.", HTTPStatus.HTTP_UNAUTHORIZED);
@@ -255,7 +346,7 @@ public final class DatabaseDriver {
               " SET post_score = post_score + ?" +
               " WHERE post_id = ?" +
               " AND ? NOT IN" +
-              "   (SELECT user_id FROM votes WHERE post_id = ?)"
+              "   (SELECT vote_user_id FROM votes WHERE vote_post_id = ?)"
       );
 
       ps.setInt(1, voteValue);
@@ -272,7 +363,7 @@ public final class DatabaseDriver {
               " SET user_score = user_score + ?" +
               " WHERE user_id = ?" +
               " AND ? NOT IN" +
-              "   (SELECT user_id FROM votes WHERE post_id = ?)"
+              "   (SELECT vote_user_id FROM votes WHERE vote_post_id = ?)"
       );
 
       ps.setInt(1, voteValue);
@@ -285,7 +376,7 @@ public final class DatabaseDriver {
       transaction.add(ps);
 
       ps = connection.prepareStatement(
-          "INSERT INTO votes (user_id, post_id) values (?, ?) ON CONFLICT DO NOTHING"
+          "INSERT INTO votes (vote_user_id, vote_post_id) values (?, ?) ON CONFLICT DO NOTHING"
       );
 
       ps.setString(1, userID);

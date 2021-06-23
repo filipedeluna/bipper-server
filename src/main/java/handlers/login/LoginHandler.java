@@ -36,6 +36,7 @@ public final class LoginHandler extends Handler {
 
       int userID = requestBody.getUserID();
       int verification = requestBody.getVerification();
+      int locationID = requestBody.getLocationID();
 
       // Validate number and verification
       if (userID < 900000000 || userID > 999999999)
@@ -49,7 +50,8 @@ public final class LoginHandler extends Handler {
 
       // Create the user if it does not exist yet
       String userHash = CryptoHelper.encryptUserName(Integer.toString(userID));
-      Config.dbDriver.createUserIfNotExists(userHash);
+
+      Config.dbDriver.createUserIfNotExists(userHash, locationID);
 
       // Create token
       WebToken token = new WebToken(userHash);

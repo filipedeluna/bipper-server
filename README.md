@@ -7,11 +7,14 @@ EVERY route is expected to respond with 500 if an internal error happens.
 ### /login GET 
 Login/register and get a token
 
+Can send a request first without locationID, ot check if user exists.
+
 Receives:
 ```json
 {
 	"userID": "int",
-	"verification": "int"
+	"verification": "int",
+	"locationID": "int" -> only needed the first time. 
 }
 ```
 Returns:
@@ -23,6 +26,7 @@ Returns:
 Errors:
 - 400: Invalid phone format, verification format or request body.
 - 401: Invalid verification code.
+- 404: User not registered.
 
 ### /locations GET 
 Get list of available loacations
@@ -108,7 +112,7 @@ Returns:
     "score": "int",
     "date": "jun 21, 2021",
     "text": "string",
-    "image": "string"
+    "image": "string" -> needs to be jpg for now. send "" for no image
   }
 ]
 ```
@@ -159,4 +163,41 @@ Errors:
 - 403: User is original author.
 - 404: Post or user does not exist.
 - 405: Invalid method type.
+
+### /user_location GET
+Get current users location
+
+Receives:
+```json
+{
+  "token": "string",
+}
+```
+
+Responds:
+```json
+{
+  "locationID": "int",
+}
+```
+
+Errors: 
+- 400: Invalid request body.
+- 404: Invalid location id.
+
+### /user_location POST
+Set users location
+
+Receives:
+```json
+{
+  "token": "string",
+  "locationID": "int"
+}
+```
+
+Errors: 
+- 400: Invalid request body or token.
+- 401: User token not authorized or expired.
+- 404: Invalid location id.
 

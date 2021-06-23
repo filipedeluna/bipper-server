@@ -33,22 +33,16 @@ public final class PostsHandler extends Handler {
             if (requestBody == null)
               throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
-            try {
-              WebToken token = WebToken.decrypt(requestBody.getToken());
-              int index = requestBody.getIndex();
+            String userID = validateToken(requestBody.getToken());
+            int index = requestBody.getIndex();
 
-              if (index < 0)
-                throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
+            if (index < 0)
+              throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
 
-              ArrayList<Post> posts = Config.dbDriver.getNewPosts(token.getUserID(), index);
+            ArrayList<Post> posts = Config.dbDriver.getNewPosts(userID, index);
 
-              respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
-              return;
-            } catch (GeneralSecurityException e) {
-              logger.severe(e.getClass().toString() + ": " + e.getMessage());
-              respond(HTTPStatus.HTTP_SERVER_ERROR, exchange);
-              return;
-            }
+            respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
+            return;
           } else if (path.startsWith("/posts/top/")) {
             // Handle top posts
             String periodString = path.replaceFirst("/posts/top/", "");
@@ -95,6 +89,12 @@ public final class PostsHandler extends Handler {
           } catch (IOException | IllegalArgumentException | UnsupportedOperationException | IllegalStateException e) {
             throw new ClientException("Invalid image. Please use a jpg.", HTTPStatus.HTTP_BAD_REQUEST);
           }
+
+          if (text.length() < 20)
+            throw new ClientException("Post text too short.", HTTPStatus.HTTP_BAD_REQUEST);
+
+          if (text.length() > 300)
+            throw new ClientException("Post text too long.", HTTPStatus.HTTP_BAD_REQUEST);
 
           Config.dbDriver.insertPost(userID, locationID, text, image);
 

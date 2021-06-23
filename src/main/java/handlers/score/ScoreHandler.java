@@ -30,7 +30,6 @@ public final class ScoreHandler extends Handler {
         throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
       String userID = validateToken(requestBody.getToken());
-      int postID = requestBody.getPostID();
 
       // Validate path
       String path = exchange.getRequestURI().getPath();
