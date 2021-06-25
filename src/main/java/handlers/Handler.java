@@ -94,8 +94,7 @@ public abstract class Handler implements HttpHandler {
 
       return body;
     } catch (UncheckedIOException e) {
-      throw new ClientException("Request body is too large.",HTTPStatus.HTTP_BAD_REQUEST);
+      throw new ClientException("Request body is too large.", HTTPStatus.HTTP_BAD_REQUEST);
     }
-
   }
 }

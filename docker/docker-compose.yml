@@ -1,11 +1,21 @@
 version: '3.8'
 
 services:
-  # ISOC PT Services -------------------------------------------------
+  bipper_client:
+    build:
+      context: ..
+      dockerfile: docker/client.dockerfile
+    environment:
+      - FLASK_PORT=5002
+      - FLASK_SECRET=7E*2aJ^e4rGuuH%c
+    network_mode: host
+    volumes:
+      - ./log:/log
+
   bipper_server:
     build:
       context: ..
-      dockerfile: docker/Dockerfile
+      dockerfile: docker/server.dockerfile
     network_mode: host
     depends_on:
       - bipper_db
