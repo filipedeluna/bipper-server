@@ -62,6 +62,7 @@ Receives:
   "token": "string",
   "text": "string",
   "image": "string",
+  "imageType": "string", -> "gif", "png" ou "jpg"
   "locationID": "int"
 
 }

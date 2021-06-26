@@ -1,6 +1,5 @@
 package handlers.post;
 
-import auth.WebToken;
 import com.sun.net.httpserver.HttpExchange;
 import db.error.DatabaseException;
 import handlers.Handler;
@@ -11,10 +10,13 @@ import utils.net.HTTPStatus;
 import utils.net.RequestMethod;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public final class PostsHandler extends Handler {
+  private static final List<String> ALLOWED_IMAGE_TYPES = Arrays.asList("jpg", "png", "gif");
+
   @Override
   public void handle(HttpExchange exchange) throws IOException {
     try {
@@ -84,13 +86,19 @@ public final class PostsHandler extends Handler {
           String image = requestBody.getImage();
 
           try {
-            if (image.length() > 0)
-              image = ImageCompressor.compress(image);
+            if (image.length() > 0) {
+              String imageType = requestBody.getImageType();
+
+              if (!ALLOWED_IMAGE_TYPES.contains(imageType))
+                throw new ClientException("Invalid image type. Please use a jpg, png or gif.", HTTPStatus.HTTP_BAD_REQUEST);
+
+              image = ImageCompressor.compress(image, imageType);
+            }
           } catch (IOException | IllegalArgumentException | UnsupportedOperationException | IllegalStateException e) {
-            throw new ClientException("Invalid image. Please use a jpg.", HTTPStatus.HTTP_BAD_REQUEST);
+            throw new ClientException("Invalid image.", HTTPStatus.HTTP_BAD_REQUEST);
           }
 
-          if (text.length() < 20)
+          if (text.length() < 30)
             throw new ClientException("Post text too short.", HTTPStatus.HTTP_BAD_REQUEST);
 
           if (text.length() > 300)

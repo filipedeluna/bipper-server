@@ -7,6 +7,7 @@ public enum PostPeriod {
   YEAR("1 year"),
   MONTH("1 month"),
   WEEK("1 week"),
+  DAY("1 day"),
   NULL("");
 
   private final String dbPeriod;
@@ -29,6 +30,8 @@ public enum PostPeriod {
         return MONTH;
       case "week":
         return WEEK;
+      case "day":
+        return DAY;
       default:
         return NULL;
     }

@@ -4,6 +4,7 @@ public final class PostsPostRequestBody {
   private String token;
   private String text;
   private String image;
+  private String imageType;
   private int locationID;
 
   public PostsPostRequestBody() {
@@ -15,6 +16,10 @@ public final class PostsPostRequestBody {
 
   public String getText() {
     return text;
+  }
+
+  public String getImageType() {
+    return imageType;
   }
 
   public String getImage() {

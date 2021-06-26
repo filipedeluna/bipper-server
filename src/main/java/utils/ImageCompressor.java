@@ -11,10 +11,10 @@ import java.io.*;
 import java.util.Iterator;
 
 public class ImageCompressor {
-  public static String compress(String base64Image) throws IOException {
+  public static String compress(String base64Image, String imageType) throws IOException {
     BufferedImage bufferedImage = ImageIO.read(new ByteArrayInputStream(Base64.decode(base64Image)));
 
-    Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName("jpg");
+    Iterator<ImageWriter> writers = ImageIO.getImageWritersByFormatName(imageType);
     ImageWriter writer = writers.next();
 
     ByteArrayOutputStream bas = new ByteArrayOutputStream();
@@ -23,7 +23,7 @@ public class ImageCompressor {
     ImageWriteParam param = writer.getDefaultWriteParam();
 
     param.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-    param.setCompressionQuality(0.1f);  // Change the quality value you prefer
+    param.setCompressionQuality(0.1f);  // Change the quality value to what you prefer
     writer.write(null, new IIOImage(bufferedImage, null, null), param);
 
     String base64ImageCompressed = Base64.toBase64String(bas.toByteArray());
