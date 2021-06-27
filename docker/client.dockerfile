@@ -4,6 +4,9 @@ LABEL vendor="Bipper" maintainer="filipe@deluna.pt"
 
 ARG FLASK_PORT
 ENV FLASK_PORT ${FLASK_PORT}
+ENV SERVER_ADDRESS ${SERVER_ADDRESS}
+ENV SERVER_PORT ${SERVER_PORT}
+
 # Install required dependencies
 RUN apk update && apk upgrade
 RUN apk add --update nodejs npm

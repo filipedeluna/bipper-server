@@ -8,6 +8,8 @@ services:
     environment:
       - FLASK_PORT=5002
       - FLASK_SECRET=7E*2aJ^e4rGuuH%c
+      - SERVER_ADDRESS=localhost
+      - SERVER_PORT=9001
     network_mode: host
     volumes:
       - ./log:/log
