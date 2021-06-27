@@ -42,7 +42,7 @@ public final class LoginHandler extends Handler {
       if (userID < 900000000 || userID > 999999999)
         throw new ClientException("Invalid Phone number format.", HTTPStatus.HTTP_BAD_REQUEST);
 
-      if (verification < 100000 || verification > 999999)
+      if (verification < 0 || verification > 999999)
         throw new ClientException("Invalid verification code format.", HTTPStatus.HTTP_BAD_REQUEST);
 
       if (!Integer.toString(userID).substring(3, 9).equals(Integer.toString(verification)))
