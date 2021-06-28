@@ -202,7 +202,7 @@ public final class DatabaseDriver {
    *
    * @throws DatabaseException if check or create user
    */
-  public void insertPost(String userID, int locationID, String text, String image) throws DatabaseException, ClientException {
+  public void insertPost(String userID, int locationID, String text, String image, String image_type) throws DatabaseException, ClientException {
     try {
       // Check when was user last post
       PreparedStatement ps = connection.prepareStatement(
@@ -219,14 +219,15 @@ public final class DatabaseDriver {
 
       // Insert post
       ps = connection.prepareStatement(
-          "INSERT INTO posts (post_user_id, post_location_id, post_text, post_image)" +
-              " VALUES (?, ?, ?, ?)"
+          "INSERT INTO posts (post_user_id, post_location_id, post_text, post_image, post_image_type)" +
+              " VALUES (?, ?, ?, ?, ?)"
       );
 
       ps.setString(1, userID);
       ps.setInt(2, locationID);
       ps.setString(3, text);
       ps.setString(4, image);
+      ps.setString(5, image_type);
 
       ps.execute();
       ps.close();

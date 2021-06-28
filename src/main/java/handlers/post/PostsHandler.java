@@ -82,17 +82,20 @@ public final class PostsHandler extends Handler {
 
           String userID = validateToken(requestBody.getToken());
           int locationID = requestBody.getLocationID();
-          String text = requestBody.getText();
+          String text = requestBody.getText().trim().replace("  ", " ");
           String image = requestBody.getImage();
+          String imageType = "";
 
           try {
             if (image.length() > 0) {
-              String imageType = requestBody.getImageType();
+              imageType = requestBody.getImageType();
+              image = requestBody.getImage().split(",")[1];
 
               if (!ALLOWED_IMAGE_TYPES.contains(imageType))
                 throw new ClientException("Invalid image type. Please use a jpg, png or gif.", HTTPStatus.HTTP_BAD_REQUEST);
 
               image = ImageCompressor.compress(image, imageType);
+              imageType = "data:image/" + imageType + ";base64,";
             }
           } catch (IOException | IllegalArgumentException | UnsupportedOperationException | IllegalStateException e) {
             throw new ClientException("Invalid image.", HTTPStatus.HTTP_BAD_REQUEST);
@@ -104,7 +107,7 @@ public final class PostsHandler extends Handler {
           if (text.length() > 300)
             throw new ClientException("Post text too long.", HTTPStatus.HTTP_BAD_REQUEST);
 
-          Config.dbDriver.insertPost(userID, locationID, text, image);
+          Config.dbDriver.insertPost(userID, locationID, text, image, imageType);
 
           respond(HTTPStatus.HTTP_OK, exchange);
           return;

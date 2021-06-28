@@ -6,7 +6,7 @@ git pull origin master
 
 # Rebuild the server JAR
 echo "Creating new client JAR from source..."
-#mvn clean package assembly:single || exit
+mvn clean package assembly:single || exit
 
 cd docker || exit
 

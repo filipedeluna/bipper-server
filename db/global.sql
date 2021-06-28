@@ -36,7 +36,8 @@ CREATE TABLE IF NOT EXISTS posts
     post_date        TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
     post_score       INTEGER                           DEFAULT 0 NOT NULL,
     post_text        TEXT                     NOT NULL,
-    post_image       TEXT                     NOT NULL
+    post_image       TEXT                     NOT NULL,
+    post_image_type  TEXT                     NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS votes

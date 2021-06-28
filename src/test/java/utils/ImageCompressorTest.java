@@ -13,7 +13,7 @@ class ImageCompressorTest {
   void compress() throws IOException {
     System.out.println(System.getProperty("user.dir"));
     String image = Base64.toBase64String(Files.readAllBytes(Paths.get("src/test/java/utils/image.jpg")));
-    String newImage = ImageCompressor.compress(image);
+    String newImage = ImageCompressor.compress(image, "jpg");
 
     System.out.println(newImage);
   }
