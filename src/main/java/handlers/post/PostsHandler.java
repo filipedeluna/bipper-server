@@ -36,12 +36,12 @@ public final class PostsHandler extends Handler {
               throw new ClientException("Invalid body.", HTTPStatus.HTTP_BAD_REQUEST);
 
             String userID = validateToken(requestBody.getToken());
-            int index = requestBody.getIndex();
+            int locationID = requestBody.getLocationID();
 
-            if (index < 0)
-              throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
+            if (locationID < 0)
+              throw new ClientException("Invalid location.", HTTPStatus.HTTP_BAD_REQUEST);
 
-            ArrayList<Post> posts = Config.dbDriver.getNewPosts(userID, index);
+            ArrayList<Post> posts = Config.dbDriver.getNewPosts(userID, locationID);
 
             respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
             return;
@@ -53,12 +53,12 @@ public final class PostsHandler extends Handler {
             if (postPeriod.equals(PostPeriod.NULL))
               throw new ClientException("Invalid time period.", HTTPStatus.HTTP_BAD_REQUEST);
 
-            int index = requestBody.getIndex();
+            int locationID = requestBody.getLocationID();
 
-            if (index < 0)
+            if (locationID < 0)
               throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
 
-            ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod, index);
+            ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod, locationID);
 
             respond(gson.toJson(posts), HTTPStatus.HTTP_OK, exchange);
             return;

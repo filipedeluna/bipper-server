@@ -8,16 +8,18 @@ public final class Post {
   private Date date;
   private String text;
   private String image;
+  private String imageType;
 
   public Post() {
   }
 
-  public Post(int postID, int score, Date date, String text, String image) {
+  public Post(int postID, int score, Date date, String text, String image, String imageType) {
     this.postID = postID;
     this.score = score;
     this.date = date;
     this.text = text;
     this.image = image;
+    this.imageType = imageType;
   }
 
   public int getPostID() {
@@ -38,5 +40,9 @@ public final class Post {
 
   public String getImage() {
     return image;
+  }
+
+  public String getImageType() {
+    return imageType;
   }
 }

@@ -2,16 +2,16 @@ package handlers.post;
 
 public final class PostsGetRequestBody {
   private String token;
-  private int index = 0;
+  private int locationID;
 
   public PostsGetRequestBody() {
   }
 
-  public int getIndex() {
-    return index;
-  }
-
   public String getToken() {
     return token;
+  }
+
+  public int getLocationID() {
+    return locationID;
   }
 }
