@@ -323,7 +323,7 @@ public final class DatabaseDriver {
     try {
       // Check post exists and get original poster id
       PreparedStatement ps = connection.prepareStatement(
-          "SELECT user_id FROM posts WHERE post_user_id = ?"
+          "SELECT post_user_id FROM posts WHERE post_id = ?"
       );
 
       ps.setInt(1, postID);
