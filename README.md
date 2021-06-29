@@ -78,7 +78,7 @@ Receives:
 ```json
 {
   "token": "string",
-  "index": "int" -> optional last post read
+  "locationID": "int" -> posts location
 }
 ```
 Returns:
@@ -102,7 +102,7 @@ Get top posts
 Optional:
 ```json
 {
-  "index": "int" -> optional last post read
+  "locationID": "int" -> posts location
 }
 ```
 Returns:
@@ -113,7 +113,8 @@ Returns:
     "score": "int",
     "date": "jun 21, 2021",
     "text": "string",
-    "image": "string" -> needs to be jpg for now. send "" for no image
+    "image": "string" 
+    "imageType": "string" 
   }
 ]
 ```

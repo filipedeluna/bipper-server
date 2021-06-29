@@ -56,7 +56,7 @@ public final class PostsHandler extends Handler {
             int locationID = requestBody.getLocationID();
 
             if (locationID < 0)
-              throw new ClientException("Invalid index", HTTPStatus.HTTP_BAD_REQUEST);
+              throw new ClientException("Invalid location id.", HTTPStatus.HTTP_BAD_REQUEST);
 
             ArrayList<Post> posts = Config.dbDriver.getTopPosts(postPeriod, locationID);
 

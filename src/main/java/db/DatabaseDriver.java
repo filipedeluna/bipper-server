@@ -285,8 +285,8 @@ public final class DatabaseDriver {
           "SELECT * FROM posts" +
               " WHERE post_date > NOW() - ?::INTERVAL" +
               " AND post_location_id = ?" +
-              " ORDER BY post_id DESC" +
-              " LIMIT 10"
+              " ORDER BY post_score DESC" +
+              " LIMIT 20"
       );
 
       ps.setString(1, period.getDbPeriod());
