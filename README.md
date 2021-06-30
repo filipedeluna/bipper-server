@@ -162,8 +162,7 @@ Responds:
 Errors: 
 - 400: Invalid request body or token.
 - 401: User token not authorized or expired.
-- 403: User is original author.
-- 404: Post or user does not exist.
+- 404: user does not exist.
 - 405: Invalid method type.
 
 ### /user_location GET
