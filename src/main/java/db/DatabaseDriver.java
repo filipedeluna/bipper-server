@@ -245,13 +245,14 @@ public final class DatabaseDriver {
       PreparedStatement ps = connection.prepareStatement(
           "SELECT * FROM posts" +
               " WHERE post_id NOT IN (SELECT vote_post_id FROM votes WHERE vote_user_id = ?)" +
-              " AND post_location_id = ?" +
+              " AND post_location_id = ? AND post_user_id != ? " +
               " ORDER BY post_id DESC" +
               " LIMIT 10"
       );
 
       ps.setString(1, userID);
       ps.setInt(2, locationID);
+      ps.setString(3, userID);
 
       ResultSet rs = ps.executeQuery();
       ArrayList<Post> posts = new ArrayList<>();
