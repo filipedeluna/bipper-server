@@ -43,7 +43,8 @@ public final class WebToken {
   }
 
   public static WebToken decrypt(String base64EncryptedToken) throws InvalidAlgorithmParameterException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-    byte[] decryptedTokenBytes = CryptoHelper.decrypt(Base64.decode(base64EncryptedToken));
+    byte[] decodedTokenBytes = Base64.decode(base64EncryptedToken);
+    byte[] decryptedTokenBytes = CryptoHelper.decrypt(decodedTokenBytes);
 
     return gson.fromJson(new String(decryptedTokenBytes, StandardCharsets.UTF_8), WebToken.class);
   }

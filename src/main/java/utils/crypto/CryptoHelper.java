@@ -1,7 +1,6 @@
 package utils.crypto;
 
 import org.bouncycastle.jce.provider.BouncyCastleProvider;
-import org.bouncycastle.util.encoders.Base64;
 import utils.Config;
 import utils.CustomLogger;
 import utils.CustomRuntimeException;
@@ -44,16 +43,20 @@ public final class CryptoHelper {
   }
 
   public static byte[] decrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidAlgorithmParameterException, InvalidKeyException {
-    gcmCipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(getIVFromByteArray(buff)));
+    byte[] iv = getIVFromByteArray(buff);
+    byte[] buffWithNoIV = removeIVFromByteArray(buff);
 
-    return gcmCipher.doFinal(removeIVFromByteArray(buff));
+    gcmCipher.init(Cipher.DECRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(iv));
+
+    return gcmCipher.doFinal(buffWithNoIV);
   }
 
   public static byte[] encrypt(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException, InvalidAlgorithmParameterException {
     byte[] iv = RandomHelper.getBytes(SEA_IV_SIZE);
+
     gcmCipher.init(Cipher.ENCRYPT_MODE, Config.serverSeaKey, new IvParameterSpec(iv));
 
-    return joinByteArrays(gcmCipher.doFinal(buff), iv);
+    return org.bouncycastle.util.Arrays.concatenate(gcmCipher.doFinal(buff), iv);
   }
 
   public static byte[] ecbHash(byte[] buff) throws BadPaddingException, IllegalBlockSizeException, InvalidKeyException {
@@ -67,7 +70,8 @@ public final class CryptoHelper {
   }
 
   public static String encryptUserName(String user) throws IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
-    BigInteger bigInteger = new BigInteger(joinByteArrays(new byte[]{0}, CryptoHelper.ecbHash(user.getBytes(StandardCharsets.UTF_8))));
+    BigInteger bigInteger = new BigInteger(org.bouncycastle.util.Arrays.concatenate(new byte[]{0}, CryptoHelper.ecbHash(user.getBytes(StandardCharsets.UTF_8))));
+
     return bigInteger.toString(16).toUpperCase();
   }
 
@@ -94,19 +98,5 @@ public final class CryptoHelper {
     return Arrays.copyOfRange(array, 0, array.length - SEA_IV_SIZE);
   }
 
-  private static byte[] joinByteArrays(byte[]... arrays) {
-    byte[] finalArray = new byte[0];
 
-    byte[] tempArray;
-    for (byte[] array : arrays) {
-      tempArray = new byte[finalArray.length + array.length];
-
-      System.arraycopy(finalArray, 0, tempArray, 0, finalArray.length);
-      System.arraycopy(array, 0, tempArray, finalArray.length, array.length);
-
-      finalArray = tempArray;
-    }
-
-    return finalArray;
-  }
 }
