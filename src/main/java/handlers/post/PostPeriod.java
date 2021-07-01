@@ -1,13 +1,11 @@
 package handlers.post;
 
-import java.util.Locale;
-
 public enum PostPeriod {
   ALL_TIME("100 years"),
   YEAR("1 year"),
   MONTH("1 month"),
   WEEK("1 week"),
-  DAY("1 day"),
+  DAY("1 days"),
   NULL("");
 
   private final String dbPeriod;

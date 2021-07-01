@@ -6,7 +6,6 @@ import db.error.DatabaseException;
 import handlers.Handler;
 import handlers.error.ClientException;
 import utils.Config;
-import utils.ImageCompressor;
 import utils.net.HTTPStatus;
 import utils.net.RequestMethod;
 
