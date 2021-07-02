@@ -15,8 +15,8 @@ RUN apk add --update nodejs npm
 RUN pip install Flask
 RUN pip install requests
 RUN pip install python-dotenv
-
-# Configure flask
+RUN pip install datetime
+RUN pip install bleach
 
 # Copy the client folder and install dependencies
 ADD docker/bipper-client /bipper-client

@@ -9,6 +9,8 @@ import utils.CustomLogger;
 import utils.net.HTTPStatus;
 import utils.net.SafeInputStreamReader;
 
+import javax.crypto.AEADBadTagException;
+import javax.crypto.IllegalBlockSizeException;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.UncheckedIOException;
@@ -50,10 +52,19 @@ public abstract class Handler implements HttpHandler {
   protected String validateToken(String token) throws ClientException {
     WebToken webToken;
 
-    try {
-      webToken = WebToken.decrypt(token);
-    } catch (GeneralSecurityException e) {
-      throw new ClientException("Token is corrupted.", HTTPStatus.HTTP_BAD_REQUEST);
+    // try 5 times to account for random failures TODO not ideal
+    int triesLeft = 5;
+
+    while (true) {
+      try {
+        webToken = WebToken.decrypt(token);
+        break;
+      } catch (IllegalBlockSizeException | AEADBadTagException | ArrayIndexOutOfBoundsException e) {
+        if (triesLeft-- > 0)
+          continue;
+      } catch (GeneralSecurityException e) {
+        throw new ClientException("Token is corrupted.", HTTPStatus.HTTP_BAD_REQUEST);
+      }
     }
 
     if (webToken.isExpired())
@@ -61,6 +72,7 @@ public abstract class Handler implements HttpHandler {
 
     return webToken.getUserID();
   }
+
 
   // ----------------------------------------
   // UTILS ----------------------------------

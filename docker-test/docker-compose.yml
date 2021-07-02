@@ -4,7 +4,7 @@ services:
   bipper_db_test:
     image: postgres:alpine
     ports:
-      - 5433:5432
+      - 9002:5432
     restart: always
     environment:
       - POSTGRES_USER=bipper

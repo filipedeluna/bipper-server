@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: docker/client.dockerfile
     environment:
-      - FLASK_PORT=5002
+      - FLASK_PORT=9000
       - FLASK_SECRET=7E*2aJ^e4rGuuH%c
       - SERVER_ADDRESS=localhost
       - SERVER_PORT=9001
@@ -27,7 +27,7 @@ services:
   bipper_db:
     image: postgres:alpine
     ports:
-      - 5432:5432
+      - 9002:5432
     restart: always
     environment:
       - POSTGRES_USER=bipper
