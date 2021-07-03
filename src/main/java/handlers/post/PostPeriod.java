@@ -4,8 +4,8 @@ public enum PostPeriod {
   ALL_TIME("100 years"),
   YEAR("1 year"),
   MONTH("1 month"),
-  WEEK("1 week"),
-  DAY("1 days"),
+  WEEK("8 days"),
+  DAY("2 days"),
   NULL("");
 
   private final String dbPeriod;
