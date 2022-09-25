@@ -1,5 +1,7 @@
 # bipper-server
 
+This is a small server application made for a hackaton. It managed the backend of an application which allowed users to report problems in public infrastructure and anonymously vote on problems they deem the most important. The application is dockerized.
+
 ## Routes
 
 EVERY route is expected to respond with 500 if an internal error happens.
